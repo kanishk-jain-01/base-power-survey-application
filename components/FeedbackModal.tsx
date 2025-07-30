@@ -33,7 +33,7 @@ export default function FeedbackModal({
   if (isValidating) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[95vw] max-w-md">
           <DialogHeader className="text-center">
             <DialogTitle className="flex items-center justify-center gap-2">
               <div className="animate-spin w-5 h-5 border-2 border-blue-40 border-t-transparent rounded-full" />
@@ -63,7 +63,7 @@ export default function FeedbackModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="w-[95vw] max-w-md">
         <DialogHeader className="text-center">
           <DialogTitle className="flex items-center justify-center gap-2">
             <Icon className={`w-5 h-5 ${iconColor}`} />

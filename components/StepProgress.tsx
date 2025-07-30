@@ -38,7 +38,7 @@ export default function StepProgress({
       </div>
 
       {/* Step Indicators */}
-      <div className="flex justify-between">
+      <div className="flex justify-between gap-2">
         {Array.from({ length: totalSteps }, (_, index) => {
           const stepId = stepIds[index];
           const isCompleted = stepId && completedSteps.includes(stepId);

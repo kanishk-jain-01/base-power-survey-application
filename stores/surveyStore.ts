@@ -23,7 +23,9 @@ export const useSurveyStore = create<SurveyState>()(
         { photoType, file, preview },
       ];
       const completedSteps = [...state.completedSteps.filter(id => id !== stepId), stepId];
-      return { photos, completedSteps };
+      // Remove the step from skippedSteps if it was previously skipped
+      const skippedSteps = state.skippedSteps.filter(id => id !== stepId);
+      return { photos, completedSteps, skippedSteps };
     }),
 
   updatePhotoValidation: (photoType: PhotoType, validation: ValidationResult) =>
@@ -34,10 +36,16 @@ export const useSurveyStore = create<SurveyState>()(
     })),
 
   skipStep: (stepId: string) =>
-    set((state) => ({
-      skippedSteps: [...state.skippedSteps, stepId],
-      completedSteps: [...state.completedSteps.filter(id => id !== stepId), stepId],
-    })),
+    set((state) => {
+      // Don't add duplicates to skippedSteps
+      const alreadySkipped = state.skippedSteps.includes(stepId);
+      const skippedSteps = alreadySkipped
+        ? state.skippedSteps
+        : [...state.skippedSteps, stepId];
+      // Remove from completedSteps when skipping
+      const completedSteps = state.completedSteps.filter(id => id !== stepId);
+      return { skippedSteps, completedSteps };
+    }),
 
   markStepCompleted: (stepId: string) =>
     set((state) => ({

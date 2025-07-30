@@ -21,7 +21,7 @@ export default function SurveyStepPage() {
   const stepId = params.stepId as string;
   const stepConfig = getStepById(stepId);
   const { addPhoto, skipStep, setMainDisconnectAmperage, completedSteps, setEditingStepId } = useSurveyStore();
-  const [showInstructionModal, setShowInstructionModal] = useState(true);
+  const [showInstructionModal, setShowInstructionModal] = useState(false);
   
   // Check if we're in editing mode
   const isEditing = searchParams.get('editingFrom') === 'review';
@@ -32,6 +32,15 @@ export default function SurveyStepPage() {
       setEditingStepId(stepId);
     }
   }, [isEditing, stepId, setEditingStepId]);
+
+  // Show instruction modal after page transition completes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowInstructionModal(true);
+    }, 350); // Slightly longer than transition duration (300ms)
+
+    return () => clearTimeout(timer);
+  }, [stepId]);
 
   if (!stepConfig) {
     return (

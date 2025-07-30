@@ -63,7 +63,7 @@ export default function PhotoPreview({
           <div className="space-y-2">
             {/* Photo Thumbnail */}
             <div 
-              className="aspect-video bg-gray-100 rounded cursor-pointer overflow-hidden"
+              className="aspect-video bg-aluminum rounded-base cursor-pointer overflow-hidden"
               onClick={() => setIsModalOpen(true)}
             >
               <img
@@ -76,7 +76,7 @@ export default function PhotoPreview({
             {/* Photo Info */}
             <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium truncate">
+                <p className="text-body-medium font-medium font-primary truncate">
                   {getPhotoTypeLabel(photoType)}
                 </p>
                 {getValidationIcon()}
@@ -142,17 +142,17 @@ export default function PhotoPreview({
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   {getValidationIcon()}
-                  <span className={`font-medium ${validation.isValid ? 'text-green-600' : 'text-red-600'}`}>
+                  <span className={`font-medium font-primary ${validation.isValid ? 'text-green-40' : 'text-red-40'}`}>
                     {validation.isValid ? 'Validation Passed' : 'Validation Failed'}
                   </span>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-body-small text-gray-60 font-primary">
                     ({Math.round(validation.confidence * 100)}% confidence)
                   </span>
                 </div>
-                <p className="text-sm text-gray-700">{validation.feedback}</p>
+                <p className="text-body-medium text-grounded font-primary">{validation.feedback}</p>
                 
                 {validation.extractedData && (
-                  <div className="mt-2 p-2 bg-gray-50 rounded text-sm">
+                  <div className="mt-2 p-2 bg-aluminum rounded-base text-body-small font-primary">
                     <p className="font-medium">Extracted Data:</p>
                     <pre className="whitespace-pre-wrap">
                       {JSON.stringify(validation.extractedData, null, 2)}

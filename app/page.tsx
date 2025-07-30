@@ -24,19 +24,19 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-blue-5">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-heading-4 text-blue-90">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-base-lg">
+        <CardHeader className="text-center space-y-3">
+          <CardTitle className="text-heading-2 text-grounded">
             Base Power Site Survey
           </CardTitle>
-          <CardDescription className="text-body-large">
+          <CardDescription className="text-body-large text-gray-60">
             Enter your email address to begin the site survey
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-body-medium font-medium">
+        <CardContent className="space-y-6">
+          <div className="space-y-3">
+            <label htmlFor="email" className="text-body-large font-medium text-grounded">
               Customer Email
             </label>
             <Input
@@ -51,7 +51,8 @@ export default function HomePage() {
           <Button
             onClick={handleStartSurvey}
             disabled={!email.trim() || isLoading}
-            className="w-full bg-blue-40 hover:bg-blue-90"
+            className="w-full"
+            size="lg"
           >
             {isLoading ? 'Starting Survey...' : 'Start Survey'}
           </Button>

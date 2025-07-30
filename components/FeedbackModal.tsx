@@ -71,18 +71,18 @@ export default function FeedbackModal({
               <span className="font-medium">
                 {isValid ? 'Validation Passed' : 'Validation Failed'}
               </span>
-              <span className="text-sm text-gray-600">
+              <span className="text-body-small text-gray-60 font-primary">
                 {Math.round(validation.confidence * 100)}% confidence
               </span>
             </div>
-            <p className="text-sm text-gray-700">{validation.feedback}</p>
+            <p className="text-body-medium text-grounded font-primary">{validation.feedback}</p>
           </div>
 
           {/* Extracted Data */}
           {validation.extractedData && (
-            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="font-medium text-sm mb-1">Extracted Information:</p>
-              <div className="text-sm text-gray-700 space-y-1">
+            <div className="p-3 bg-green-5 border border-green-10 rounded-base">
+              <p className="font-medium text-body-medium font-primary mb-1">Extracted Information:</p>
+              <div className="text-body-medium text-grounded font-primary space-y-1">
                 {Object.entries(validation.extractedData).map(([key, value]) => (
                   <div key={key} className="flex justify-between">
                     <span className="capitalize">{key.replace(/([A-Z])/g, ' $1')}:</span>
@@ -116,7 +116,7 @@ export default function FeedbackModal({
             ) : (
               <>
                 <Button
-                  className="flex-1 bg-blue-40 hover:bg-blue-90"
+                  className="flex-1"
                   onClick={onRetake}
                 >
                   <RotateCcw className="w-4 h-4 mr-2" />

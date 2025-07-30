@@ -52,8 +52,8 @@ export default function SurveyStepPage() {
   };
 
   return (
-    <div className="min-h-screen bg-blue-5 p-4">
-      <div className="max-w-md mx-auto space-y-4">
+    <div className="min-h-screen p-4">
+      <div className="max-w-md mx-auto space-y-6">
         {/* Progress Indicator */}
         <StepProgress
           currentStep={progress.current}

@@ -192,8 +192,8 @@ export default function CameraView({
       case 'meter_closeup':
         return (
           <div className={overlayStyles}>
-            <div className="absolute inset-4 border-2 border-blue-40 rounded-lg">
-              <div className="absolute -top-8 left-0 bg-blue-40 text-white px-2 py-1 rounded text-sm">
+            <div className="absolute inset-4 border-2 border-grounded rounded-base">
+              <div className="absolute -top-8 left-0 bg-grounded text-white px-2 py-1 rounded-base text-body-small font-primary">
                 Frame the meter display clearly
               </div>
             </div>
@@ -203,8 +203,8 @@ export default function CameraView({
       case 'meter_area_wide':
         return (
           <div className={overlayStyles}>
-            <div className="absolute inset-8 border-2 border-dashed border-blue-40 rounded-lg">
-              <div className="absolute -top-8 left-0 bg-blue-40 text-white px-2 py-1 rounded text-sm">
+            <div className="absolute inset-8 border-2 border-dashed border-grounded rounded-base">
+              <div className="absolute -top-8 left-0 bg-grounded text-white px-2 py-1 rounded-base text-body-small font-primary">
                 Show entire meter area
               </div>
             </div>
@@ -214,7 +214,7 @@ export default function CameraView({
       default:
         return (
           <div className={overlayStyles}>
-            <div className="absolute inset-6 border-2 border-blue-40 rounded-lg opacity-50" />
+            <div className="absolute inset-6 border-2 border-grounded rounded-base opacity-50" />
           </div>
         );
     }
@@ -224,10 +224,10 @@ export default function CameraView({
     return (
       <Card className="p-6 text-center">
         <div className="space-y-4">
-          <div className="text-red-600">
+          <div className="text-red-40">
             <Camera className="w-12 h-12 mx-auto mb-2" />
-            <p className="font-medium">Camera Error</p>
-            <p className="text-sm text-gray-600">{error}</p>
+            <p className="font-medium text-heading-6 font-primary">Camera Error</p>
+            <p className="text-body-medium text-gray-60 font-primary">{error}</p>
           </div>
           <Button onClick={startCamera} variant="outline">
             <RotateCcw className="w-4 h-4 mr-2" />
@@ -242,7 +242,7 @@ export default function CameraView({
     <div className="space-y-4">
       {/* Instruction */}
       <Card className="p-4">
-        <p className="text-body-large text-center">{instruction}</p>
+        <p className="text-body-large text-center font-primary text-grounded">{instruction}</p>
       </Card>
 
       {/* Camera View */}
@@ -297,7 +297,7 @@ export default function CameraView({
             </Button>
             <Button
               onClick={capturePhoto}
-              className="flex-1 bg-blue-40 hover:bg-blue-90"
+              className="flex-1"
               disabled={!isStreaming || isCapturing}
             >
               <Camera className="w-4 h-4 mr-2" />
@@ -316,7 +316,8 @@ export default function CameraView({
             </Button>
             <Button
               onClick={confirmPhoto}
-              className="flex-1 bg-green-600 hover:bg-green-700"
+              variant="secondary"
+              className="flex-1"
             >
               <Check className="w-4 h-4 mr-2" />
               Use Photo

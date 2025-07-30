@@ -170,6 +170,6 @@ export function getOverlayStyles(config: OverlayConfig): {
   return {
     containerClass: 'absolute inset-0 pointer-events-none',
     borderClass: `absolute ${insetClass} border-2 ${borderStyleClass} ${borderColorClass} rounded-base`,
-    labelClass: 'absolute -top-8 left-0 bg-grounded text-white px-2 py-1 rounded-base text-body-small font-primary'
+    labelClass: 'absolute top-4 left-1/2 transform -translate-x-1/2 bg-grounded text-white px-3 py-2 rounded-base text-body-small font-primary text-center whitespace-nowrap'
   };
 }

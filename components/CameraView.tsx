@@ -203,7 +203,7 @@ export default function CameraView({
           <div className="absolute top-1/3 left-4 right-4 h-0.5 bg-grounded opacity-30" />
           <div className="absolute top-2/3 left-4 right-4 h-0.5 bg-grounded opacity-30" />
           {config.label && (
-            <div className="absolute top-4 left-4 bg-grounded text-white px-2 py-1 rounded-base text-body-small font-primary">
+            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-grounded text-white px-3 py-2 rounded-base text-body-small font-primary text-center whitespace-nowrap">
               {config.label}
             </div>
           )}
@@ -223,7 +223,7 @@ export default function CameraView({
           {/* Corner guides - bottom right */}
           <div className="absolute bottom-8 right-8 w-6 h-6 border-b-2 border-r-2 border-grounded" />
           {config.label && (
-            <div className="absolute top-4 left-4 bg-grounded text-white px-2 py-1 rounded-base text-body-small font-primary">
+            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-grounded text-white px-3 py-2 rounded-base text-body-small font-primary text-center whitespace-nowrap">
               {config.label}
             </div>
           )}
@@ -235,7 +235,7 @@ export default function CameraView({
     if (!config.show) {
       return config.label ? (
         <div className={styles.containerClass}>
-          <div className="absolute top-4 left-4 bg-grounded text-white px-2 py-1 rounded-base text-body-small font-primary">
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-grounded text-white px-3 py-2 rounded-base text-body-small font-primary text-center whitespace-nowrap">
             {config.label}
           </div>
         </div>

@@ -1,17 +1,20 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import { Info } from 'lucide-react';
 
 interface StepProgressProps {
   currentStep: number;
   totalSteps: number;
   stepTitles?: string[];
+  onInfoClick?: () => void;
 }
 
 export default function StepProgress({
   currentStep,
   totalSteps,
   stepTitles = [],
+  onInfoClick,
 }: StepProgressProps) {
   return (
     <div className="w-full space-y-2">
@@ -48,9 +51,20 @@ export default function StepProgress({
       {/* Step Title */}
       {stepTitles[currentStep] && (
         <div className="text-center">
-          <p className="text-body-medium text-gray-60 font-primary">
-            {stepTitles[currentStep]}
-          </p>
+          <div className="flex items-center justify-center gap-2">
+            <p className="text-body-medium text-gray-60 font-primary">
+              {stepTitles[currentStep]}
+            </p>
+            {onInfoClick && (
+              <button
+                onClick={onInfoClick}
+                className="p-1 text-gray-60 hover:text-grounded transition-colors"
+                aria-label="Show instructions"
+              >
+                <Info className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>

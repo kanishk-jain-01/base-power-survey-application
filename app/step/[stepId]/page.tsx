@@ -1,9 +1,11 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import CameraView from '@/components/CameraView';
 import StepProgress from '@/components/StepProgress';
+import InstructionModal from '@/components/InstructionModal';
 import {
   getStepById,
   getNextStepId,
@@ -19,6 +21,7 @@ export default function SurveyStepPage() {
   const stepId = params.stepId as string;
   const stepConfig = getStepById(stepId);
   const { addPhoto } = useSurveyStore();
+  const [showInstructionModal, setShowInstructionModal] = useState(true);
 
   if (!stepConfig) {
     return (
@@ -58,13 +61,14 @@ export default function SurveyStepPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen overflow-hidden">
       {/* Header with Progress */}
       <div className="flex-shrink-0 p-4 max-w-md mx-auto w-full">
         <StepProgress
           currentStep={progress.current}
           totalSteps={progress.total}
           stepTitles={stepTitles}
+          onInfoClick={() => setShowInstructionModal(true)}
         />
       </div>
 
@@ -72,11 +76,18 @@ export default function SurveyStepPage() {
       <div className="flex-1 px-4 pb-4">
         <CameraView
           photoType={stepConfig.photoType}
-          instruction={stepConfig.instruction}
           onPhotoCapture={handlePhotoCapture}
           onRetry={handleBack}
         />
       </div>
+
+      {/* Instruction Modal */}
+      <InstructionModal
+        isOpen={showInstructionModal}
+        onClose={() => setShowInstructionModal(false)}
+        title={stepConfig.title}
+        instruction={stepConfig.instruction}
+      />
     </div>
   );
 }

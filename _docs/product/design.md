@@ -233,8 +233,3 @@ This is a mobile-first application. Ensure all designs work optimally on mobile 
 3. **Consistency**: Use only the defined color palette and typography scale
 4. **Testing**: Test designs across different devices and screen sizes
 5. **Performance**: Optimize for mobile performance given the camera and AR features
-
-## Security Considerations
-- Use Next.js authentication for secure access
-- Implement data encryption for sensitive survey information
-- Follow security best practices for file uploads and API endpoints

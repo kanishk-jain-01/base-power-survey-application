@@ -61,7 +61,7 @@ export default function SurveyStepPage() {
   };
 
   return (
-    <div className="flex flex-col h-dvh overflow-hidden">
+    <div className="flex flex-col h-dvh portrait:overflow-hidden landscape:min-h-dvh landscape:overflow-auto">
       {/* Header with Progress */}
       <div className="flex-shrink-0 p-4 max-w-md mx-auto w-full">
         <StepProgress
@@ -73,7 +73,7 @@ export default function SurveyStepPage() {
       </div>
 
       {/* Camera Component - Takes remaining space */}
-      <div className="flex-1 px-4 pb-4 overflow-hidden">
+      <div className="portrait:flex-1 landscape:flex-none px-4 pb-4 portrait:overflow-hidden">
         <CameraView
           photoType={stepConfig.photoType}
           onPhotoCapture={handlePhotoCapture}

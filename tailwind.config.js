@@ -133,6 +133,11 @@ module.exports = {
         // Dynamic viewport height for mobile-first responsive design
         dvh: '100dvh',
       },
+      screens: {
+        // Add landscape orientation detection
+        'landscape': {'raw': '(orientation: landscape)'},
+        'portrait': {'raw': '(orientation: portrait)'},
+      },
       borderRadius: {
         base: '8px',
         'base-lg': '12px',

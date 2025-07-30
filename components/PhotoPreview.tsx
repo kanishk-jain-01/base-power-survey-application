@@ -36,7 +36,6 @@ export default function PhotoPreview({
       meter_area_right: 'Meter Area Right',
       meter_area_left: 'Meter Area Left',
       adjacent_wall: 'Adjacent Wall',
-      area_behind_fence: 'Behind Fence',
       ac_unit_label: 'A/C Unit Label',
       second_ac_unit_label: 'Second A/C Label',
       breaker_box_interior: 'Breaker Box Interior',

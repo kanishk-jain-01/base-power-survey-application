@@ -8,6 +8,7 @@ import { PhotoType, ValidationResult } from '@/lib/types';
 import FeedbackModal from '@/components/FeedbackModal';
 import CameraControls from '@/components/CameraControls';
 import { validatePhotoClient } from '@/lib/llm';
+import { getOverlayConfig, getOverlayStyles } from '@/lib/photoOverlays';
 
 interface CameraViewProps {
   photoType: PhotoType;
@@ -191,38 +192,92 @@ export default function CameraView({
 
   // AR guidance overlay based on photo type
   const renderGuidanceOverlay = () => {
-    const overlayStyles = 'absolute inset-0 pointer-events-none';
+    const config = getOverlayConfig(photoType);
+    const styles = getOverlayStyles(config);
 
-    switch (photoType) {
-      case 'meter_closeup':
-        return (
-          <div className={overlayStyles}>
-            <div className="absolute inset-4 border-2 border-grounded rounded-base">
-              <div className="absolute -top-8 left-0 bg-grounded text-white px-2 py-1 rounded-base text-body-small font-primary">
-                Frame the meter display clearly
-              </div>
+    // Handle special variants
+    if (config.variant === 'horizontal-third') {
+      return (
+        <div className={styles.containerClass}>
+          {/* Rule of thirds horizontal lines */}
+          <div className="absolute top-1/3 left-4 right-4 h-0.5 bg-grounded opacity-30" />
+          <div className="absolute top-2/3 left-4 right-4 h-0.5 bg-grounded opacity-30" />
+          {config.label && (
+            <div className="absolute top-4 left-4 bg-grounded text-white px-2 py-1 rounded-base text-body-small font-primary">
+              {config.label}
             </div>
-          </div>
-        );
-
-      case 'meter_area_wide':
-        return (
-          <div className={overlayStyles}>
-            <div className="absolute inset-8 border-2 border-dashed border-grounded rounded-base">
-              <div className="absolute -top-8 left-0 bg-grounded text-white px-2 py-1 rounded-base text-body-small font-primary">
-                Show entire meter area
-              </div>
-            </div>
-          </div>
-        );
-
-      default:
-        return (
-          <div className={overlayStyles}>
-            <div className="absolute inset-6 border-2 border-grounded rounded-base opacity-50" />
-          </div>
-        );
+          )}
+        </div>
+      );
     }
+
+    if (config.variant === 'corners-only') {
+      return (
+        <div className={styles.containerClass}>
+          {/* Corner guides - top left */}
+          <div className="absolute top-8 left-8 w-6 h-6 border-t-2 border-l-2 border-grounded" />
+          {/* Corner guides - top right */}
+          <div className="absolute top-8 right-8 w-6 h-6 border-t-2 border-r-2 border-grounded" />
+          {/* Corner guides - bottom left */}
+          <div className="absolute bottom-8 left-8 w-6 h-6 border-b-2 border-l-2 border-grounded" />
+          {/* Corner guides - bottom right */}
+          <div className="absolute bottom-8 right-8 w-6 h-6 border-b-2 border-r-2 border-grounded" />
+          {config.label && (
+            <div className="absolute top-4 left-4 bg-grounded text-white px-2 py-1 rounded-base text-body-small font-primary">
+              {config.label}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Standard overlay with bounding box
+    if (!config.show) {
+      return config.label ? (
+        <div className={styles.containerClass}>
+          <div className="absolute top-4 left-4 bg-grounded text-white px-2 py-1 rounded-base text-body-small font-primary">
+            {config.label}
+          </div>
+        </div>
+      ) : null;
+    }
+
+    // Calculate inline styles as fallback for dynamic values
+    const getInlineStyles = () => {
+      if (typeof config.inset === 'number') {
+        return {
+          top: `${config.inset}px`,
+          bottom: `${config.inset}px`,
+          left: `${config.inset}px`,
+          right: `${config.inset}px`
+        };
+      } else {
+        const [vertical, horizontal] = config.inset;
+        return {
+          top: `${vertical}px`,
+          bottom: `${vertical}px`,
+          left: `${horizontal}px`,
+          right: `${horizontal}px`
+        };
+      }
+    };
+
+    const borderStyle = config.style === 'dashed' ? 'dashed' : 'solid';
+
+    return (
+      <div className={styles.containerClass}>
+        <div 
+          className={`absolute border-2 border-grounded rounded-base ${config.style === 'dashed' ? 'border-dashed' : 'border-solid'}`}
+          style={getInlineStyles()}
+        >
+          {config.label && (
+            <div className={styles.labelClass}>
+              {config.label}
+            </div>
+          )}
+        </div>
+      </div>
+    );
   };
 
   if (error) {

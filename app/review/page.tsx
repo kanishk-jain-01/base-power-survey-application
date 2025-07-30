@@ -22,6 +22,13 @@ export default function ReviewPage() {
     router.push('/step/meter-closeup');
   };
 
+  const handleClearSurvey = () => {
+    if (confirm('Are you sure you want to clear all survey data? This cannot be undone.')) {
+      resetSurvey();
+      router.push('/');
+    }
+  };
+
   const handleSubmitSurvey = async () => {
     // TODO: Implement survey submission to API
     console.log('Submitting survey:', { customerEmail, photos });
@@ -142,22 +149,35 @@ export default function ReviewPage() {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-2 pt-4 border-t">
+              <div className="space-y-3 pt-4 border-t">
+                {/* Primary Action */}
                 <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={handleEditSurvey}
-                >
-                  Edit Survey
-                </Button>
-                <Button
-                  className="flex-1"
+                  className="w-full"
                   onClick={handleSubmitSurvey}
                   disabled={!isComplete}
                   size="lg"
                 >
                   Submit Survey
                 </Button>
+                
+                {/* Secondary Actions */}
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Button
+                    variant="outline"
+                    className="w-full sm:flex-1"
+                    onClick={handleEditSurvey}
+                  >
+                    Edit Survey
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="w-full sm:flex-1"
+                    onClick={handleClearSurvey}
+                    size="sm"
+                  >
+                    Clear Survey
+                  </Button>
+                </div>
               </div>
             </div>
           </CardContent>

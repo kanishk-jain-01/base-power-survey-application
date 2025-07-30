@@ -42,7 +42,7 @@ export default function CameraControls({
           )}
           <Button
             onClick={onCapturePhoto}
-            className={showSkip ? "flex-1" : "w-full"}
+            className={showSkip ? "flex-1" : "max-w-xs mx-auto"}
             disabled={!isStreaming || isCapturing}
           >
             <Camera className="w-4 h-4 mr-2" />

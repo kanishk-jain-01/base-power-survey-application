@@ -5,6 +5,7 @@ module.exports = {
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
+    './lib/**/*.{ts,tsx}', // Include library files (e.g., overlay config)
     './src/**/*.{ts,tsx}',
   ],
   prefix: '',

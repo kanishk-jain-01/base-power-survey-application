@@ -3,7 +3,12 @@
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Eye, RotateCcw, CheckCircle, AlertCircle } from 'lucide-react';
 import { PhotoType, ValidationResult } from '@/lib/types';
 
@@ -20,7 +25,7 @@ export default function PhotoPreview({
   preview,
   validation,
   onRetake,
-  className = ""
+  className = '',
 }: PhotoPreviewProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -43,7 +48,7 @@ export default function PhotoPreview({
 
   const getValidationIcon = () => {
     if (!validation) return null;
-    
+
     if (validation.isValid) {
       return <CheckCircle className="w-4 h-4 text-green-600" />;
     } else {
@@ -62,7 +67,7 @@ export default function PhotoPreview({
         <CardContent className="p-2">
           <div className="space-y-2">
             {/* Photo Thumbnail */}
-            <div 
+            <div
               className="aspect-video bg-aluminum rounded-base cursor-pointer overflow-hidden"
               onClick={() => setIsModalOpen(true)}
             >
@@ -84,7 +89,9 @@ export default function PhotoPreview({
 
               {/* Validation Status */}
               {validation && (
-                <p className={`text-xs ${validation.isValid ? 'text-green-600' : 'text-red-600'}`}>
+                <p
+                  className={`text-xs ${validation.isValid ? 'text-green-600' : 'text-red-600'}`}
+                >
                   {validation.feedback}
                 </p>
               )}
@@ -126,7 +133,7 @@ export default function PhotoPreview({
               {getValidationIcon()}
             </DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             {/* Full Size Image */}
             <div className="w-full max-h-[60vh] overflow-hidden rounded-lg">
@@ -142,15 +149,21 @@ export default function PhotoPreview({
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   {getValidationIcon()}
-                  <span className={`font-medium font-primary ${validation.isValid ? 'text-green-40' : 'text-red-40'}`}>
-                    {validation.isValid ? 'Validation Passed' : 'Validation Failed'}
+                  <span
+                    className={`font-medium font-primary ${validation.isValid ? 'text-green-40' : 'text-red-40'}`}
+                  >
+                    {validation.isValid
+                      ? 'Validation Passed'
+                      : 'Validation Failed'}
                   </span>
                   <span className="text-body-small text-gray-60 font-primary">
                     ({Math.round(validation.confidence * 100)}% confidence)
                   </span>
                 </div>
-                <p className="text-body-medium text-grounded font-primary">{validation.feedback}</p>
-                
+                <p className="text-body-medium text-grounded font-primary">
+                  {validation.feedback}
+                </p>
+
                 {validation.extractedData && (
                   <div className="mt-2 p-2 bg-aluminum rounded-base text-body-small font-primary">
                     <p className="font-medium">Extracted Data:</p>

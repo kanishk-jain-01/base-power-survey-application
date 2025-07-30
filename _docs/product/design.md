@@ -1,18 +1,21 @@
 # Base Power Company - Design Implementation Guide
 
 ## Overview
+
 This document contains the complete design system for the Base Power Company Site Survey Application. All design tokens, colors, typography, and configurations are based on the official brand guidelines.
 
 ## Brand Identity
 
 ### Primary Colors
+
 - **Grounded**: `#084D41` (Primary dark green)
-- **Livewire**: `#D0F585` (Primary light green) 
+- **Livewire**: `#D0F585` (Primary light green)
 - **Aluminum**: `#EDEFF0` (Light gray)
 
 These colors should remain dominant throughout the Base experience. While not every element must use these specific tones, they should be consistently present across key design elements and provide the background for all Base-specific interactions.
 
 ### Typography
+
 - **Primary Font**: PP Neue Montreal
 - **Fallback Font**: Inter
 - **System Fallback**: system-ui, sans-serif
@@ -26,15 +29,12 @@ Copy and paste this `tailwind.config.js` file exactly as shown:
 ```javascript
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
-    "./public/index.html",
-  ],
+  content: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
   theme: {
     extend: {
       colors: {
         // PRIMARY COLORS (from brand guidelines)
-        'grounded': {
+        grounded: {
           DEFAULT: '#084D41', // Primary dark green
           50: '#E8F5F3',
           100: '#D1EBE7',
@@ -47,7 +47,7 @@ module.exports = {
           800: '#0A3E36',
           900: '#084D41', // Brand color
         },
-        'livewire': {
+        livewire: {
           DEFAULT: '#D0F585', // Primary light green
           50: '#F8FEF0',
           100: '#F1FDE1',
@@ -60,7 +60,7 @@ module.exports = {
           800: '#ACEC37',
           900: '#A0E91D',
         },
-        'aluminum': {
+        aluminum: {
           DEFAULT: '#EDEFF0', // Light gray
           50: '#FDFDFD',
           100: '#FAFBFB',
@@ -113,8 +113,8 @@ module.exports = {
         },
       },
       fontFamily: {
-        'primary': ['PP Neue Montreal', 'Inter', 'system-ui', 'sans-serif'],
-        'fallback': ['Inter', 'system-ui', 'sans-serif'],
+        primary: ['PP Neue Montreal', 'Inter', 'system-ui', 'sans-serif'],
+        fallback: ['Inter', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         // Typography hierarchy based on brand guidelines
@@ -131,40 +131,42 @@ module.exports = {
         'body-xsmall': ['10px', { lineHeight: '1.4', fontWeight: '400' }],
       },
       fontWeight: {
-        'regular': '400',
-        'medium': '500',
-        'semibold': '600',
+        regular: '400',
+        medium: '500',
+        semibold: '600',
       },
       spacing: {
         // Additional spacing utilities for consistency
-        '18': '4.5rem',
-        '88': '22rem',
+        18: '4.5rem',
+        88: '22rem',
       },
       borderRadius: {
-        'base': '8px',
+        base: '8px',
         'base-lg': '12px',
       },
       boxShadow: {
-        'base': '0 2px 8px rgba(8, 77, 65, 0.1)',
+        base: '0 2px 8px rgba(8, 77, 65, 0.1)',
         'base-lg': '0 4px 16px rgba(8, 77, 65, 0.15)',
       },
     },
   },
   plugins: [],
-}
+};
 ```
 
 ## Typography Hierarchy
 
 ### Headings
+
 - **Heading 1**: 48px, Line Height 1.2, Font Weight 600
-- **Heading 2**: 40px, Line Height 1.2, Font Weight 600  
+- **Heading 2**: 40px, Line Height 1.2, Font Weight 600
 - **Heading 3**: 32px, Line Height 1.3, Font Weight 600
 - **Heading 4**: 24px, Line Height 1.3, Font Weight 600
 - **Heading 5**: 20px, Line Height 1.4, Font Weight 600
 - **Heading 6**: 18px, Line Height 1.4, Font Weight 600
 
 ### Body Copy
+
 - **Body XLarge**: 18px, Line Height 1.5, Font Weight 400
 - **Body Large**: 16px, Line Height 1.5, Font Weight 400
 - **Body Medium**: 14px, Line Height 1.5, Font Weight 400
@@ -174,43 +176,110 @@ module.exports = {
 ## Usage Examples
 
 ### CSS Classes for Typography
+
 ```css
 /* Headings */
-.text-heading-1 { font-size: 48px; line-height: 1.2; font-weight: 600; }
-.text-heading-2 { font-size: 40px; line-height: 1.2; font-weight: 600; }
-.text-heading-3 { font-size: 32px; line-height: 1.3; font-weight: 600; }
-.text-heading-4 { font-size: 24px; line-height: 1.3; font-weight: 600; }
-.text-heading-5 { font-size: 20px; line-height: 1.4; font-weight: 600; }
-.text-heading-6 { font-size: 18px; line-height: 1.4; font-weight: 600; }
+.text-heading-1 {
+  font-size: 48px;
+  line-height: 1.2;
+  font-weight: 600;
+}
+.text-heading-2 {
+  font-size: 40px;
+  line-height: 1.2;
+  font-weight: 600;
+}
+.text-heading-3 {
+  font-size: 32px;
+  line-height: 1.3;
+  font-weight: 600;
+}
+.text-heading-4 {
+  font-size: 24px;
+  line-height: 1.3;
+  font-weight: 600;
+}
+.text-heading-5 {
+  font-size: 20px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+.text-heading-6 {
+  font-size: 18px;
+  line-height: 1.4;
+  font-weight: 600;
+}
 
 /* Body Text */
-.text-body-xlarge { font-size: 18px; line-height: 1.5; font-weight: 400; }
-.text-body-large { font-size: 16px; line-height: 1.5; font-weight: 400; }
-.text-body-medium { font-size: 14px; line-height: 1.5; font-weight: 400; }
-.text-body-small { font-size: 12px; line-height: 1.4; font-weight: 400; }
-.text-body-xsmall { font-size: 10px; line-height: 1.4; font-weight: 400; }
+.text-body-xlarge {
+  font-size: 18px;
+  line-height: 1.5;
+  font-weight: 400;
+}
+.text-body-large {
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 400;
+}
+.text-body-medium {
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 400;
+}
+.text-body-small {
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 400;
+}
+.text-body-xsmall {
+  font-size: 10px;
+  line-height: 1.4;
+  font-weight: 400;
+}
 ```
 
 ### Color Usage Examples
+
 ```css
 /* Primary Brand Colors */
-.bg-grounded { background-color: #084D41; }
-.text-grounded { color: #084D41; }
-.bg-livewire { background-color: #D0F585; }
-.text-livewire { color: #D0F585; }
-.bg-aluminum { background-color: #EDEFF0; }
-.text-aluminum { color: #EDEFF0; }
+.bg-grounded {
+  background-color: #084d41;
+}
+.text-grounded {
+  color: #084d41;
+}
+.bg-livewire {
+  background-color: #d0f585;
+}
+.text-livewire {
+  color: #d0f585;
+}
+.bg-aluminum {
+  background-color: #edeff0;
+}
+.text-aluminum {
+  color: #edeff0;
+}
 
 /* Semantic Colors */
-.bg-green-90 { background-color: #084D41; }
-.bg-orange-40 { background-color: #E3703F; }
-.bg-red-40 { background-color: #DF4903; }
-.bg-blue-40 { background-color: #1B8BAC; }
+.bg-green-90 {
+  background-color: #084d41;
+}
+.bg-orange-40 {
+  background-color: #e3703f;
+}
+.bg-red-40 {
+  background-color: #df4903;
+}
+.bg-blue-40 {
+  background-color: #1b8bac;
+}
 ```
 
 ## Design Guidelines
 
 ### Color Applications
+
 - Use **Grounded** (#084D41) for primary actions, headers, and key navigation elements
 - Use **Livewire** (#D0F585) for accents, success states, and secondary actions
 - Use **Aluminum** (#EDEFF0) for backgrounds, cards, and neutral elements
@@ -218,12 +287,14 @@ module.exports = {
 - Use semantic colors (green, orange, red, blue) for status indicators and feedback
 
 ### Spacing and Layout
+
 - Use the custom spacing utilities (`spacing.18` and `spacing.88`) for consistent layouts
 - Apply `border-radius: base` (8px) for standard elements
 - Apply `border-radius: base-lg` (12px) for larger components
 - Use the defined box shadows for elevation and depth
 
 ### Mobile-First Approach
+
 This is a mobile-first application. Ensure all designs work optimally on mobile devices before scaling up to larger screens.
 
 ## Implementation Notes

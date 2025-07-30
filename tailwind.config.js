@@ -1,25 +1,25 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: ["class"],
+  darkMode: ['class'],
   content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
+    './pages/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './app/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
   ],
-  prefix: "",
+  prefix: '',
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: '2rem',
       screens: {
-        "2xl": "1400px",
+        '2xl': '1400px',
       },
     },
     extend: {
       colors: {
         // PRIMARY COLORS (from brand guidelines)
-        'grounded': {
+        grounded: {
           DEFAULT: '#084D41', // Primary dark green
           50: '#E8F5F3',
           100: '#D1EBE7',
@@ -32,7 +32,7 @@ module.exports = {
           800: '#0A3E36',
           900: '#084D41', // Brand color
         },
-        'livewire': {
+        livewire: {
           DEFAULT: '#D0F585', // Primary light green
           50: '#F8FEF0',
           100: '#F1FDE1',
@@ -45,7 +45,7 @@ module.exports = {
           800: '#ACEC37',
           900: '#A0E91D',
         },
-        'aluminum': {
+        aluminum: {
           DEFAULT: '#EDEFF0', // Light gray
           50: '#FDFDFD',
           100: '#FAFBFB',
@@ -98,8 +98,8 @@ module.exports = {
         },
       },
       fontFamily: {
-        'primary': ['Inter', 'system-ui', 'sans-serif'], // Using Inter until PP Neue Montreal is loaded
-        'fallback': ['Inter', 'system-ui', 'sans-serif'],
+        primary: ['Inter', 'system-ui', 'sans-serif'], // Using Inter until PP Neue Montreal is loaded
+        fallback: ['Inter', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         // Typography hierarchy based on brand guidelines
@@ -116,38 +116,38 @@ module.exports = {
         'body-xsmall': ['10px', { lineHeight: '1.4', fontWeight: '400' }],
       },
       fontWeight: {
-        'regular': '400',
-        'medium': '500',
-        'semibold': '600',
+        regular: '400',
+        medium: '500',
+        semibold: '600',
       },
       spacing: {
         // Additional spacing utilities for consistency
-        '18': '4.5rem',
-        '88': '22rem',
+        18: '4.5rem',
+        88: '22rem',
       },
       borderRadius: {
-        'base': '8px',
+        base: '8px',
         'base-lg': '12px',
       },
       boxShadow: {
-        'base': '0 2px 8px rgba(8, 77, 65, 0.1)',
+        base: '0 2px 8px rgba(8, 77, 65, 0.1)',
         'base-lg': '0 4px 16px rgba(8, 77, 65, 0.15)',
       },
       keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
+        'accordion-down': {
+          from: { height: '0' },
+          to: { height: 'var(--radix-accordion-content-height)' },
         },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: '0' },
         },
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
-}
+  plugins: [require('tailwindcss-animate')],
+};

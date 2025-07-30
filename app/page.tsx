@@ -4,7 +4,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { useSurveyStore } from '@/stores/surveyStore';
 
 export default function HomePage() {
@@ -15,10 +21,10 @@ export default function HomePage() {
 
   const handleStartSurvey = async () => {
     if (!email.trim()) return;
-    
+
     setIsLoading(true);
     setCustomerEmail(email);
-    
+
     // Navigate to first survey step
     router.push('/step/meter-closeup');
   };
@@ -36,7 +42,10 @@ export default function HomePage() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-3">
-            <label htmlFor="email" className="text-body-large font-medium text-grounded">
+            <label
+              htmlFor="email"
+              className="text-body-large font-medium text-grounded"
+            >
               Customer Email
             </label>
             <Input

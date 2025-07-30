@@ -4,7 +4,13 @@ import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import CameraView from '@/components/CameraView';
 import StepProgress from '@/components/StepProgress';
-import { getStepById, getNextStepId, getPreviousStepId, getStepProgress, SURVEY_STEPS } from '@/lib/surveySteps';
+import {
+  getStepById,
+  getNextStepId,
+  getPreviousStepId,
+  getStepProgress,
+  SURVEY_STEPS,
+} from '@/lib/surveySteps';
 import { useSurveyStore } from '@/stores/surveyStore';
 
 export default function SurveyStepPage() {
@@ -27,12 +33,12 @@ export default function SurveyStepPage() {
   }
 
   const progress = getStepProgress(stepId);
-  const stepTitles = SURVEY_STEPS.map(step => step.title);
+  const stepTitles = SURVEY_STEPS.map((step) => step.title);
 
   const handlePhotoCapture = (file: File, preview: string) => {
     // Add photo to survey state
     addPhoto(stepConfig.photoType, file, preview);
-    
+
     // Navigate to next step or review
     const nextStepId = getNextStepId(stepId);
     if (nextStepId) {

@@ -6,72 +6,68 @@ This document details the core data entities within the Base Power Company Site 
 
 Based on the survey requirements, the primary entities are:
 
-* **Customer:** Represents the individual for whom the survey is being conducted.
+- **Customer:** Represents the individual for whom the survey is being conducted.
+  - `customer_id` (Primary Key)
 
-  * `customer_id` (Primary Key)
+  - `email` (Unique identifier, used for survey keying)
 
-  * `email` (Unique identifier, used for survey keying)
+  - `name` (Optional, if collected)
 
-  * `name` (Optional, if collected)
+  - `phone_number` (Optional)
 
-  * `phone_number` (Optional)
+- **Survey:** Represents a single completed site survey.
+  - `survey_id` (Primary Key)
 
-* **Survey:** Represents a single completed site survey.
+  - `customer_id` (Foreign Key to Customer)
 
-  * `survey_id` (Primary Key)
+  - `start_timestamp`
 
-  * `customer_id` (Foreign Key to Customer)
+  - `completion_timestamp`
 
-  * `start_timestamp`
+  - `geolocation` (Overall survey location)
 
-  * `completion_timestamp`
+  - `status` (e.g., 'pending', 'completed', 'validated', 'rejected')
 
-  * `geolocation` (Overall survey location)
+  - `user_signature_data` (Digital signature)
 
-  * `status` (e.g., 'pending', 'completed', 'validated', 'rejected')
+  - `notes` (Any additional notes from the surveyor)
 
-  * `user_signature_data` (Digital signature)
+  - `validation_results` (JSON/Text field for AI validation output)
 
-  * `notes` (Any additional notes from the surveyor)
+- **Photo:** Represents an individual photo captured during the survey. Each photo is associated with a specific survey and a type.
+  - `photo_id` (Primary Key)
 
-  * `validation_results` (JSON/Text field for AI validation output)
+  - `survey_id` (Foreign Key to Survey)
 
-* **Photo:** Represents an individual photo captured during the survey. Each photo is associated with a specific survey and a type.
+  - `s3_url` (URL to the stored image in AWS S3)
 
-  * `photo_id` (Primary Key)
+  - `photo_type` (e.g., 'meter_closeup', 'ac_unit_wide', 'breaker_box_interior', 'conditional')
 
-  * `survey_id` (Foreign Key to Survey)
+  - `capture_timestamp`
 
-  * `s3_url` (URL to the stored image in AWS S3)
+  - `geolocation` (Specific photo location, if different from survey)
 
-  * `photo_type` (e.g., 'meter_closeup', 'ac_unit_wide', 'breaker_box_interior', 'conditional')
-
-  * `capture_timestamp`
-
-  * `geolocation` (Specific photo location, if different from survey)
-
-  * `metadata` (JSON/Text field for EXIF data, AI analysis, etc.)
+  - `metadata` (JSON/Text field for EXIF data, AI analysis, etc.)
 
 ## 2. Relationships
 
 The relationships between these entities are as follows:
 
-* **One-to-Many (1:N) between Customer and Survey:**
+- **One-to-Many (1:N) between Customer and Survey:**
+  - A single `Customer` can have multiple `Surveys` associated with them over time.
 
-  * A single `Customer` can have multiple `Surveys` associated with them over time.
+  - Each `Survey` belongs to exactly one `Customer`.
 
-  * Each `Survey` belongs to exactly one `Customer`.
+- **One-to-Many (1:N) between Survey and Photo:**
+  - A single `Survey` will contain multiple `Photos`.
 
-* **One-to-Many (1:N) between Survey and Photo:**
-
-  * A single `Survey` will contain multiple `Photos`.
-
-  * Each `Photo` belongs to exactly one `Survey`.
+  - Each `Photo` belongs to exactly one `Survey`.
 
 ## 3. Entity-Relationship Diagram (ERD)
+
 erDiagram
-    CUSTOMER ||--o{ SURVEY : has
-    SURVEY ||--o{ PHOTO : contains
+CUSTOMER ||--o{ SURVEY : has
+SURVEY ||--o{ PHOTO : contains
 
     CUSTOMER {
         VARCHAR customer_id PK

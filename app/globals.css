@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
 @layer base {
   * {
     @apply border-aluminum-600;
@@ -21,16 +19,38 @@
 
 /* Typography utilities based on brand guidelines */
 @layer components {
-  .heading-brand-1 { @apply text-heading-1 font-semibold text-grounded; }
-  .heading-brand-2 { @apply text-heading-2 font-semibold text-grounded; }
-  .heading-brand-3 { @apply text-heading-3 font-semibold text-grounded; }
-  .heading-brand-4 { @apply text-heading-4 font-semibold text-grounded; }
-  .heading-brand-5 { @apply text-heading-5 font-semibold text-grounded; }
-  .heading-brand-6 { @apply text-heading-6 font-semibold text-grounded; }
-  
-  .body-brand-xl { @apply text-body-xlarge text-grounded; }
-  .body-brand-lg { @apply text-body-large text-grounded; }
-  .body-brand-md { @apply text-body-medium text-grounded; }
-  .body-brand-sm { @apply text-body-small text-grounded; }
-  .body-brand-xs { @apply text-body-xsmall text-grounded; }
+  .heading-brand-1 {
+    @apply text-heading-1 font-semibold text-grounded;
+  }
+  .heading-brand-2 {
+    @apply text-heading-2 font-semibold text-grounded;
+  }
+  .heading-brand-3 {
+    @apply text-heading-3 font-semibold text-grounded;
+  }
+  .heading-brand-4 {
+    @apply text-heading-4 font-semibold text-grounded;
+  }
+  .heading-brand-5 {
+    @apply text-heading-5 font-semibold text-grounded;
+  }
+  .heading-brand-6 {
+    @apply text-heading-6 font-semibold text-grounded;
+  }
+
+  .body-brand-xl {
+    @apply text-body-xlarge text-grounded;
+  }
+  .body-brand-lg {
+    @apply text-body-large text-grounded;
+  }
+  .body-brand-md {
+    @apply text-body-medium text-grounded;
+  }
+  .body-brand-sm {
+    @apply text-body-small text-grounded;
+  }
+  .body-brand-xs {
+    @apply text-body-xsmall text-grounded;
+  }
 }

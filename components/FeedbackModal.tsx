@@ -34,8 +34,8 @@ export default function FeedbackModal({
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+          <DialogHeader className="text-center">
+            <DialogTitle className="flex items-center justify-center gap-2">
               <div className="animate-spin w-5 h-5 border-2 border-blue-40 border-t-transparent rounded-full" />
               Validating Photo...
             </DialogTitle>
@@ -64,8 +64,8 @@ export default function FeedbackModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+        <DialogHeader className="text-center">
+          <DialogTitle className="flex items-center justify-center gap-2">
             <Icon className={`w-5 h-5 ${iconColor}`} />
             {isValid ? 'Photo Validated' : 'Photo Issues Detected'}
           </DialogTitle>

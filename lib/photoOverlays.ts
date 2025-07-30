@@ -1,103 +1,90 @@
 import { PhotoType } from '@/lib/types';
 
 export interface OverlayConfig {
-  /** Inset from edges in pixels, or [vertical, horizontal] for asymmetric */
-  inset: number | [number, number];
-  /** Border style for the overlay */
-  style: 'solid' | 'dashed' | 'none';
+  /** Overlay size based on shot distance requirements */
+  size: 'large' | 'medium' | 'small';
   /** Whether to show the overlay bounding box */
   show: boolean;
   /** Helper text to display above the overlay */
   label?: string;
-  /** Special overlay variants for specific composition guides */
-  variant?: 'vertical-third' | 'horizontal-third' | 'corners-only';
 }
 
 /**
  * Configuration for camera overlay guidance per photo type.
  * Each PhotoType should have a corresponding entry to ensure
  * appropriate visual guidance for users.
+ * 
+ * Overlay sizes are distance-based:
+ * - Large: Close-up shots (~90% viewport) - tight subject framing
+ * - Medium: Medium shots (~70% viewport) - moderate framing  
+ * - Small: Wide shots (~50% viewport) - contextual framing
  */
 export const OVERLAY_CONFIG: Record<PhotoType, OverlayConfig> = {
-  // Meter photos - need precise framing
+  // Close-up shots - large overlay for precise subject framing
   meter_closeup: {
-    inset: 16,
-    style: 'solid',
+    size: 'large',
     show: true,
     label: 'Frame the meter display clearly'
   },
   
-  meter_area_wide: {
-    inset: 32,
-    style: 'dashed',
+  ac_unit_label: {
+    size: 'large',
     show: true,
-    label: 'Show entire meter area'
+    label: 'Get close enough to read label text clearly'
   },
   
-  // Side areas - vertical rectangles to guide panning
+  second_ac_unit_label: {
+    size: 'large',
+    show: true,
+    label: 'Get close enough to read label text clearly'
+  },
+  
+  main_disconnect_switch: {
+    size: 'large',
+    show: true,
+    label: 'Center main switch - make rating visible'
+  },
+  
+  // Medium shots - moderate overlay for panel areas and side views
   meter_area_right: {
-    inset: [16, 64],
-    style: 'dashed',
+    size: 'medium',
     show: true,
     label: 'Area right of meter'
   },
   
   meter_area_left: {
-    inset: [16, 64],
-    style: 'dashed',
+    size: 'medium',
     show: true,
     label: 'Area left of meter'
   },
   
-  // Wall shots - rule of thirds guidance only
-  adjacent_wall: {
-    inset: 0,
-    style: 'none',
-    show: false,
-    variant: 'horizontal-third',
-    label: 'Corner to corner wall view'
-  },
-  
-  area_behind_fence: {
-    inset: 32,
-    style: 'dashed',
-    show: true,
-    label: 'Show fence and area behind it'
-  },
-  
-  // Label shots - need tight, readable framing
-  ac_unit_label: {
-    inset: 16,
-    style: 'solid',
-    show: true,
-    label: 'Zoom until label text is readable'
-  },
-  
-  second_ac_unit_label: {
-    inset: 16,
-    style: 'solid',
-    show: true,
-    label: 'Zoom until label text is readable'
-  },
-  
-  // Electrical panel shots
   breaker_box_interior: {
-    inset: 24,
-    style: 'solid',
+    size: 'medium',
     show: true,
     label: 'Capture all breakers in panel'
   },
   
-  main_disconnect_switch: {
-    inset: 16,
-    style: 'solid',
+  // Wide shots - small overlay for contextual area shots
+  meter_area_wide: {
+    size: 'small',
     show: true,
-    label: 'Center main switch - make rating visible'
+    label: 'Show entire meter area'
+  },
+  
+  adjacent_wall: {
+    size: 'small',
+    show: true,
+    label: 'Corner to corner wall view'
+  },
+  
+  area_behind_fence: {
+    size: 'small',
+    show: true,
+    label: 'Show fence and area behind it'
   },
   
   breaker_box_area: {
-    inset: 32,
-    style: 'dashed',
+    size: 'small',
     show: true,
     label: 'Show area around breaker box'
   }
@@ -137,7 +124,7 @@ export function getOverlayStyles(config: OverlayConfig): {
   borderClass: string;
   labelClass: string;
 } {
-  const { inset, style, show } = config;
+  const { size, show } = config;
   
   if (!show) {
     return {
@@ -147,29 +134,24 @@ export function getOverlayStyles(config: OverlayConfig): {
     };
   }
   
-  // Map inset values to predefined Tailwind classes
+  // Map overlay sizes to inset classes
   let insetClass = '';
-  if (typeof inset === 'number') {
-    switch (inset) {
-      case 16: insetClass = 'inset-4'; break;
-      case 24: insetClass = 'inset-6'; break;
-      case 32: insetClass = 'inset-8'; break;
-      case 48: insetClass = 'inset-12'; break;
-      case 64: insetClass = 'inset-16'; break;
-      default: insetClass = 'inset-6'; // fallback
-    }
-  } else {
-    const [vertical, horizontal] = inset;
-    // Handle asymmetric insets for side areas
-    if (vertical === 16 && horizontal === 64) {
-      insetClass = 'top-4 bottom-4 left-16 right-16';
-    } else {
-      insetClass = 'inset-6'; // fallback
-    }
+  switch (size) {
+    case 'large':
+      insetClass = 'inset-4'; // ~90% viewport (16px inset)
+      break;
+    case 'medium':
+      insetClass = 'inset-8'; // ~70% viewport (32px inset)
+      break;
+    case 'small':
+      insetClass = 'inset-16'; // ~50% viewport (64px inset)
+      break;
+    default:
+      insetClass = 'inset-8'; // fallback to medium
   }
   
-  // Border style classes
-  const borderStyleClass = style === 'dashed' ? 'border-dashed' : 'border-solid';
+  // All overlays are dashed with consistent styling
+  const borderStyleClass = 'border-dashed';
   const borderColorClass = 'border-grounded';
   
   return {

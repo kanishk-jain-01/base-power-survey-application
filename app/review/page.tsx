@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Card,
@@ -9,13 +10,17 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import PhotoPreview from '@/components/PhotoPreview';
 import { useSurveyStore } from '@/stores/surveyStore';
 import { SURVEY_STEPS } from '@/lib/surveySteps';
+import { Edit2, Check, X } from 'lucide-react';
 
 export default function ReviewPage() {
-  const { photos, customerEmail, resetSurvey, skippedSteps, mainDisconnectAmperage } = useSurveyStore();
+  const { photos, customerEmail, resetSurvey, skippedSteps, mainDisconnectAmperage, setMainDisconnectAmperage } = useSurveyStore();
   const router = useRouter();
+  const [isEditingAmperage, setIsEditingAmperage] = useState(false);
+  const [editAmperageValue, setEditAmperageValue] = useState('');
 
   const handleEditSurvey = () => {
     // Navigate back to first step to edit
@@ -45,6 +50,24 @@ export default function ReviewPage() {
     if (step) {
       router.push(`/step/${step.id}?editingFrom=review`);
     }
+  };
+
+  const handleEditAmperage = () => {
+    setEditAmperageValue(mainDisconnectAmperage?.toString() || '');
+    setIsEditingAmperage(true);
+  };
+
+  const handleSaveAmperage = () => {
+    const value = parseInt(editAmperageValue);
+    if (!isNaN(value) && value > 0) {
+      setMainDisconnectAmperage(value);
+      setIsEditingAmperage(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditingAmperage(false);
+    setEditAmperageValue('');
   };
 
   const validPhotos = photos.filter((p) => p.file && p.preview);
@@ -83,10 +106,53 @@ export default function ReviewPage() {
               {/* Main Disconnect Amperage */}
               {mainDisconnectAmperage && (
                 <div>
-                  <p className="font-medium text-grounded text-body-large">
-                    Main Disconnect Amperage:
-                  </p>
-                  <p className="text-gray-60 text-body-large">{mainDisconnectAmperage} A</p>
+                  <div className="flex items-center justify-between">
+                    <p className="font-medium text-grounded text-body-large">
+                      Main Disconnect Amperage:
+                    </p>
+                    {!isEditingAmperage && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleEditAmperage}
+                        className="h-8 px-2 text-blue-600 hover:text-blue-700"
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {isEditingAmperage ? (
+                    <div className="flex items-center gap-2 mt-2">
+                      <Input
+                        type="number"
+                        value={editAmperageValue}
+                        onChange={(e) => setEditAmperageValue(e.target.value)}
+                        placeholder="e.g., 100, 150, 200"
+                        className="w-32 text-center"
+                      />
+                      <span className="text-gray-60 text-body-large">A</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleSaveAmperage}
+                        disabled={!editAmperageValue || isNaN(parseInt(editAmperageValue)) || parseInt(editAmperageValue) <= 0}
+                        className="h-8 px-2 text-green-600 hover:text-green-700"
+                      >
+                        <Check className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleCancelEdit}
+                        className="h-8 px-2 text-gray-500 hover:text-gray-700"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <p className="text-gray-60 text-body-large">{mainDisconnectAmperage} A</p>
+                  )}
                 </div>
               )}
 
@@ -170,10 +236,9 @@ export default function ReviewPage() {
                     Edit Survey
                   </Button>
                   <Button
-                    variant="destructive"
-                    className="w-full sm:flex-1"
+                    variant="outline"
+                    className="w-full sm:flex-1 border-orange-40 text-orange-40 hover:bg-orange-5 hover:text-orange-90"
                     onClick={handleClearSurvey}
-                    size="sm"
                   >
                     Clear Survey
                   </Button>

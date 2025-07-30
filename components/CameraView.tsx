@@ -224,85 +224,26 @@ export default function CameraView({
     const config = getOverlayConfig(photoType);
     const styles = getOverlayStyles(config);
 
-    // Handle special variants
-    if (config.variant === 'horizontal-third') {
-      return (
-        <div className={styles.containerClass}>
-          {/* Rule of thirds horizontal lines */}
-          <div className="absolute top-1/3 left-4 right-4 h-0.5 bg-grounded opacity-30" />
-          <div className="absolute top-2/3 left-4 right-4 h-0.5 bg-grounded opacity-30" />
-          {config.label && (
-            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-grounded text-white px-3 py-2 rounded-base text-body-small font-primary text-center whitespace-nowrap">
-              {config.label}
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    if (config.variant === 'corners-only') {
-      return (
-        <div className={styles.containerClass}>
-          {/* Corner guides - top left */}
-          <div className="absolute top-8 left-8 w-6 h-6 border-t-2 border-l-2 border-grounded" />
-          {/* Corner guides - top right */}
-          <div className="absolute top-8 right-8 w-6 h-6 border-t-2 border-r-2 border-grounded" />
-          {/* Corner guides - bottom left */}
-          <div className="absolute bottom-8 left-8 w-6 h-6 border-b-2 border-l-2 border-grounded" />
-          {/* Corner guides - bottom right */}
-          <div className="absolute bottom-8 right-8 w-6 h-6 border-b-2 border-r-2 border-grounded" />
-          {config.label && (
-            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-grounded text-white px-3 py-2 rounded-base text-body-small font-primary text-center whitespace-nowrap">
-              {config.label}
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    // Standard overlay with bounding box
+    // Show label only if overlay is disabled
     if (!config.show) {
       return config.label ? (
         <div className={styles.containerClass}>
-          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-grounded text-white px-3 py-2 rounded-base text-body-small font-primary text-center whitespace-nowrap">
+          <div className={styles.labelClass}>
             {config.label}
           </div>
         </div>
       ) : null;
     }
 
-    // Calculate inline styles as fallback for dynamic values
-    const getInlineStyles = () => {
-      if (typeof config.inset === 'number') {
-        return {
-          top: `${config.inset}px`,
-          bottom: `${config.inset}px`,
-          left: `${config.inset}px`,
-          right: `${config.inset}px`
-        };
-      } else {
-        const [vertical, horizontal] = config.inset;
-        return {
-          top: `${vertical}px`,
-          bottom: `${vertical}px`,
-          left: `${horizontal}px`,
-          right: `${horizontal}px`
-        };
-      }
-    };
-
+    // Standard dashed overlay with size-based positioning
     return (
       <div className={styles.containerClass}>
-        <div 
-          className={`absolute border-2 border-grounded rounded-base ${config.style === 'dashed' ? 'border-dashed' : 'border-solid'}`}
-          style={getInlineStyles()}
-        >
-          {config.label && (
-            <div className={styles.labelClass}>
-              {config.label}
-            </div>
-          )}
-        </div>
+        <div className={styles.borderClass} />
+        {config.label && (
+          <div className={styles.labelClass}>
+            {config.label}
+          </div>
+        )}
       </div>
     );
   };

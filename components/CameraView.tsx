@@ -4,7 +4,9 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Camera, RotateCcw, Check, X } from 'lucide-react';
-import { PhotoType } from '@/lib/types';
+import { PhotoType, ValidationResult } from '@/lib/types';
+import FeedbackModal from '@/components/FeedbackModal';
+import { validatePhotoClient } from '@/lib/llm';
 
 interface CameraViewProps {
   photoType: PhotoType;
@@ -26,7 +28,11 @@ export default function CameraView({
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
+  const [capturedFile, setCapturedFile] = useState<File | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
+  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
 
   // Initialize camera stream
   const startCamera = useCallback(async () => {
@@ -46,8 +52,24 @@ export default function CameraView({
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
-        setIsStreaming(true);
+        
+        // Handle play() promise to avoid interruption errors
+        const playPromise = videoRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              setIsStreaming(true);
+            })
+            .catch((error) => {
+              // Handle play interruption gracefully
+              if (error.name !== 'AbortError') {
+                console.error('Video play error:', error);
+                setError('Unable to start camera preview');
+              }
+            });
+        } else {
+          setIsStreaming(true);
+        }
       }
     } catch (err) {
       console.error('Error accessing camera:', err);
@@ -92,30 +114,66 @@ export default function CameraView({
         
         const preview = canvas.toDataURL('image/jpeg', 0.8);
         setCapturedPhoto(preview);
+        setCapturedFile(file);
         setIsCapturing(false);
       }
     }, 'image/jpeg', 0.8);
   }, [photoType, isStreaming]);
 
-  // Confirm captured photo
-  const confirmPhoto = useCallback(() => {
-    if (!capturedPhoto || !canvasRef.current) return;
+  // Validate and confirm captured photo
+  const confirmPhoto = useCallback(async () => {
+    if (!capturedPhoto || !capturedFile) return;
 
-    canvasRef.current.toBlob((blob) => {
-      if (blob) {
-        const file = new File([blob], `${photoType}-${Date.now()}.jpg`, {
-          type: 'image/jpeg'
-        });
-        onPhotoCapture(file, capturedPhoto);
-      }
-    }, 'image/jpeg', 0.8);
-  }, [capturedPhoto, photoType, onPhotoCapture]);
+    try {
+      setIsValidating(true);
+      setShowFeedback(true);
+      
+      // Validate photo with LLM
+      const validation = await validatePhotoClient(capturedFile, photoType);
+      setValidationResult(validation);
+      setIsValidating(false);
+      
+    } catch (error) {
+      console.error('Validation error:', error);
+      setIsValidating(false);
+      
+      // Fallback: accept photo without validation
+      setValidationResult({
+        isValid: true,
+        confidence: 0.5,
+        feedback: 'Validation unavailable. Photo accepted for manual review.',
+        extractedData: null,
+      });
+    }
+  }, [capturedPhoto, capturedFile, photoType]);
 
   // Retake photo
   const retakePhoto = useCallback(() => {
     setCapturedPhoto(null);
+    setCapturedFile(null);
     setIsCapturing(false);
+    setValidationResult(null);
+    setShowFeedback(false);
   }, []);
+
+  // Handle validation feedback actions
+  const handleContinue = useCallback(() => {
+    if (capturedFile && capturedPhoto) {
+      onPhotoCapture(capturedFile, capturedPhoto);
+      setShowFeedback(false);
+    }
+  }, [capturedFile, capturedPhoto, onPhotoCapture]);
+
+  const handleOverride = useCallback(() => {
+    if (capturedFile && capturedPhoto) {
+      onPhotoCapture(capturedFile, capturedPhoto);
+      setShowFeedback(false);
+    }
+  }, [capturedFile, capturedPhoto, onPhotoCapture]);
+
+  const handleRetakeFromModal = useCallback(() => {
+    retakePhoto();
+  }, [retakePhoto]);
 
   // Initialize camera on mount
   useEffect(() => {
@@ -124,7 +182,7 @@ export default function CameraView({
     return () => {
       stopCamera();
     };
-  }, [startCamera, stopCamera]);
+  }, []); // Remove dependencies to prevent multiple initializations
 
   // AR guidance overlay based on photo type
   const renderGuidanceOverlay = () => {
@@ -266,6 +324,17 @@ export default function CameraView({
           </>
         )}
       </div>
+
+      {/* Validation Feedback Modal */}
+      <FeedbackModal
+        isOpen={showFeedback}
+        onClose={() => setShowFeedback(false)}
+        validation={validationResult}
+        isValidating={isValidating}
+        onRetake={handleRetakeFromModal}
+        onContinue={handleContinue}
+        onOverride={handleOverride}
+      />
     </div>
   );
 }

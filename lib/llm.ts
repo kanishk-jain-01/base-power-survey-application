@@ -40,10 +40,7 @@ Criteria for ${photoType}:`;
 - Captures corner-to-corner view if possible
 - Includes corner of house if visible`,
 
-    area_behind_fence: `
-- Contains a visible fence
-- Shows space between fence and house wall
-- Captures area that was previously obstructed`,
+
 
     ac_unit_label: `
 - Contains a metallic or paper label with technical specifications

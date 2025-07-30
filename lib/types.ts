@@ -34,7 +34,6 @@ export type PhotoType =
   | 'meter_area_right'
   | 'meter_area_left'
   | 'adjacent_wall'
-  | 'area_behind_fence'
   | 'ac_unit_label'
   | 'second_ac_unit_label'
   | 'breaker_box_interior'

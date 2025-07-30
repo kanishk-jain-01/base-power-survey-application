@@ -33,9 +33,9 @@ export default function FeedbackModal({
   if (isValidating) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+        <DialogContent className="w-[95vw] max-w-md">
+          <DialogHeader className="text-center">
+            <DialogTitle className="flex items-center justify-center gap-2">
               <div className="animate-spin w-5 h-5 border-2 border-blue-40 border-t-transparent rounded-full" />
               Validating Photo...
             </DialogTitle>
@@ -63,17 +63,17 @@ export default function FeedbackModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+      <DialogContent className="w-[95vw] max-w-md">
+        <DialogHeader className="text-center">
+          <DialogTitle className="flex items-center justify-center gap-2">
             <Icon className={`w-5 h-5 ${iconColor}`} />
             {isValid ? 'Photo Validated' : 'Photo Issues Detected'}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="flex flex-col w-full space-y-4 items-stretch sm:items-center">
           {/* Validation Status */}
-          <div className={`p-4 rounded-lg border ${bgColor} ${borderColor}`}>
+          <div className={`p-4 rounded-lg border ${bgColor} ${borderColor} w-full`}>
             <div className="flex items-center justify-between mb-2">
               <span className="font-medium">
                 {isValid ? 'Validation Passed' : 'Validation Failed'}
@@ -89,7 +89,7 @@ export default function FeedbackModal({
 
           {/* Extracted Data */}
           {validation.extractedData && (
-            <div className="p-3 bg-green-5 border border-green-10 rounded-base">
+            <div className="p-3 bg-green-5 border border-green-10 rounded-base w-full">
               <p className="font-medium text-body-medium font-primary mb-1">
                 Extracted Information:
               </p>
@@ -109,7 +109,7 @@ export default function FeedbackModal({
           )}
 
           {/* Action Buttons */}
-          <div className="flex gap-2 pt-2">
+          <div className="flex gap-2 pt-2 w-full">
             {isValid ? (
               <>
                 <Button variant="outline" className="flex-1" onClick={onRetake}>

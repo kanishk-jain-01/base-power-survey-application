@@ -71,7 +71,7 @@ export default function FeedbackModal({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 flex flex-col items-center">
+        <div className="space-y-4 flex flex-col items-center w-full">
           {/* Validation Status */}
           <div className={`p-4 rounded-lg border ${bgColor} ${borderColor} w-full`}>
             <div className="flex items-center justify-between mb-2">

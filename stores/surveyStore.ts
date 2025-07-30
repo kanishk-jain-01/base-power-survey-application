@@ -6,6 +6,8 @@ export const useSurveyStore = create<SurveyState>((set, get) => ({
   customerEmail: '',
   photos: [],
   surveyData: {},
+  skippedSteps: [],
+  mainDisconnectAmperage: undefined,
 
   setCustomerEmail: (email: string) => set({ customerEmail: email }),
 
@@ -24,6 +26,14 @@ export const useSurveyStore = create<SurveyState>((set, get) => ({
       ),
     })),
 
+  skipStep: (stepId: string) =>
+    set((state) => ({
+      skippedSteps: [...state.skippedSteps, stepId],
+    })),
+
+  setMainDisconnectAmperage: (amperage: number) =>
+    set({ mainDisconnectAmperage: amperage }),
+
   nextStep: () => set((state) => ({ currentStep: state.currentStep + 1 })),
 
   previousStep: () =>
@@ -37,5 +47,7 @@ export const useSurveyStore = create<SurveyState>((set, get) => ({
       customerEmail: '',
       photos: [],
       surveyData: {},
+      skippedSteps: [],
+      mainDisconnectAmperage: undefined,
     }),
 }));

@@ -3,6 +3,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import CameraView from '@/components/CameraView';
 import StepProgress from '@/components/StepProgress';
 import InstructionModal from '@/components/InstructionModal';
@@ -20,7 +21,7 @@ export default function SurveyStepPage() {
   const router = useRouter();
   const stepId = params.stepId as string;
   const stepConfig = getStepById(stepId);
-  const { addPhoto } = useSurveyStore();
+  const { addPhoto, skipStep } = useSurveyStore();
   const [showInstructionModal, setShowInstructionModal] = useState(true);
 
   if (!stepConfig) {
@@ -60,6 +61,19 @@ export default function SurveyStepPage() {
     }
   };
 
+  const handleSkip = () => {
+    // Add step to skipped list
+    skipStep(stepId);
+    
+    // Navigate to next step or review
+    const nextStepId = getNextStepId(stepId);
+    if (nextStepId) {
+      router.push(`/step/${nextStepId}`);
+    } else {
+      router.push('/review');
+    }
+  };
+
   return (
     <div className="flex flex-col h-dvh portrait:overflow-hidden landscape:min-h-dvh landscape:overflow-auto">
       {/* Header with Progress */}
@@ -79,6 +93,19 @@ export default function SurveyStepPage() {
           onPhotoCapture={handlePhotoCapture}
           onRetry={handleBack}
         />
+        
+        {/* Skip button for conditional steps */}
+        {stepConfig.isConditional && (
+          <div className="flex justify-center mt-4">
+            <Button
+              variant="ghost"
+              onClick={handleSkip}
+              className="text-sm"
+            >
+              Skip This Step
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Instruction Modal */}

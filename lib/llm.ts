@@ -1,14 +1,19 @@
 import { ValidationResult, PhotoType } from '@/lib/types';
 
+// Photos that need data extraction
+const NEEDS_DATA_EXTRACTION: PhotoType[] = ['main_disconnect_switch'];
+
 // Photo validation prompts based on survey criteria
 const getValidationPrompt = (photoType: PhotoType): string => {
+  const wantsData = NEEDS_DATA_EXTRACTION.includes(photoType);
+  const jsonFields = wantsData
+    ? '- isValid: boolean (true if photo meets all criteria)\n- confidence: number (0-1, confidence in your assessment)\n- feedback: string (specific feedback for the user)\n- extractedData: object (any data you can extract from the image)'
+    : '- isValid: boolean (true if photo meets all criteria)\n- confidence: number (0-1, confidence in your assessment)\n- feedback: string (specific feedback for the user)';
+
   const basePrompt = `You are an expert at validating home energy survey photos. Analyze this image and determine if it meets the criteria for a "${photoType}" photo.
 
 Return a JSON response with:
-- isValid: boolean (true if photo meets all criteria)
-- confidence: number (0-1, confidence in your assessment)
-- feedback: string (specific feedback for the user)
-- extractedData: object (any data you can extract from the image)
+${jsonFields}
 
 Criteria for ${photoType}:`;
 
@@ -40,13 +45,17 @@ Criteria for ${photoType}:`;
 - Captures corner-to-corner view if possible
 - Includes corner of house if visible`,
 
+    area_behind_fence: `
+- Fence is visible in the image
+- Shows space between fence and house wall
+- Image is sharp and not blurry`,
+
 
 
     ac_unit_label: `
 - Contains a metallic or paper label with technical specifications
 - Text is readable, especially LRA or RLA numbers
-- Label is the primary subject of the photo
-- Extract any visible specification numbers`,
+- Label is the primary subject of the photo`,
 
     second_ac_unit_label: `
 - Contains a metallic or paper label with technical specifications
@@ -72,9 +81,11 @@ Criteria for ${photoType}:`;
 - Includes surrounding area and any obstructions`,
   };
 
-  return `${basePrompt}\n${criteria[photoType]}
-
-If extracting data (like meter readings, LRA numbers, amperage), include specific values in extractedData.`;
+  const dataExtractionNote = wantsData 
+    ? '\n\nIf extracting data (like amperage numbers), include specific values in extractedData.'
+    : '';
+  
+  return `${basePrompt}\n${criteria[photoType]}${dataExtractionNote}`;
 };
 
 // Convert image file to base64 for API

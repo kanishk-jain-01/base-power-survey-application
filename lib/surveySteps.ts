@@ -62,6 +62,19 @@ export const SURVEY_STEPS: SurveyStep[] = [
     ],
   },
   {
+    id: 'area-behind-fence',
+    title: 'Area Behind Fence (If Applicable)',
+    instruction:
+      'If there is a fence on this side of the house, please take a photo of the area behind it. Otherwise, tap "Skip".',
+    photoType: 'area_behind_fence',
+    validationChecks: [
+      'Fence is visible',
+      'Shows space between fence and wall',
+      'Image is sharp and not blurry',
+    ],
+    isConditional: true,
+  },
+  {
     id: 'ac-unit-label',
     title: 'A/C Unit Label',
     instruction:

@@ -248,7 +248,7 @@ export default function CameraView({
   }
 
   return (
-    <div className="relative h-full">
+    <div className="relative h-full max-h-dvh">
       {/* Camera View */}
       <div className="relative h-full md:aspect-video md:max-h-[70vh] md:mx-auto bg-black rounded-lg overflow-hidden">
         {/* Video Stream */}

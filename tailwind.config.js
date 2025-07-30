@@ -125,6 +125,14 @@ module.exports = {
         18: '4.5rem',
         88: '22rem',
       },
+      height: {
+        // Dynamic viewport height for mobile-first responsive design
+        dvh: '100dvh',
+      },
+      minHeight: {
+        // Dynamic viewport height for mobile-first responsive design
+        dvh: '100dvh',
+      },
       borderRadius: {
         base: '8px',
         'base-lg': '12px',

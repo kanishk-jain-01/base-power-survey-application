@@ -18,7 +18,7 @@
   - [ ] 2.2 Configure Prisma ORM with database connection
   - [ ] 2.3 Create Prisma schema for Customer, Survey, and Photo entities
   - [ ] 2.4 Implement database relationships (1:N Customer-Survey, 1:N Survey-Photo)
-  - [ ] 2.5 Add required fields: timestamps, geolocation, validation_results, metadata
+  - [ ] 2.5 Add required fields: timestamps, validation_results, metadata
   - [ ] 2.6 Create and run initial database migration
   - [ ] 2.7 Implement database connection utility in `lib/db.ts`
   - [ ] 2.8 Create seed script for development data
@@ -45,11 +45,9 @@
   - [ ] 4.5 Implement visual guidance overlays for proper photo framing
   - [ ] 4.6 Create step definitions for meter, AC unit, and breaker box photos
   - [ ] 4.7 Implement photo capture functionality with metadata collection
-  - [ ] 4.8 Add geolocation capture for each photo
-  - [ ] 4.9 Implement step validation and navigation logic
-  - [ ] 4.10 Create conditional photo prompts based on site conditions
-  - [ ] 4.11 Add retry and skip functionality for difficult captures
-  - [ ] 4.12 Implement offline capability for photo storage
+  - [ ] 4.8 Implement step validation and navigation logic
+  - [ ] 4.9 Create conditional photo prompts based on site conditions
+  - [ ] 4.10 Add retry and skip functionality for difficult captures
 
 - [ ] 5.0 AI Validation and Processing
   - [ ] 5.1 Set up LLM API integration (OpenAI/xAI) in `lib/llm.ts`
@@ -65,14 +63,13 @@
   - [ ] 6.1 Create comprehensive review page layout
   - [ ] 6.2 Implement photo gallery with edit/retake functionality
   - [ ] 6.3 Add data summary and confirmation interface
-  - [ ] 6.4 Build digital signature capture component
-  - [ ] 6.5 Configure AWS S3 for secure photo storage
-  - [ ] 6.6 Implement photo upload functionality with progress tracking
-  - [ ] 6.7 Create submission API route (`/api/submit`)
-  - [ ] 6.8 Integrate with Base Power API for data forwarding
-  - [ ] 6.9 Implement submission confirmation and receipt generation
-  - [ ] 6.10 Add error handling for submission failures
-  - [ ] 6.11 Create data export functionality for backup purposes
+  - [ ] 6.4 Configure AWS S3 for secure photo storage
+  - [ ] 6.5 Implement photo upload functionality with progress tracking
+  - [ ] 6.6 Create submission API route (`/api/submit`)
+  - [ ] 6.7 Integrate with Base Power API for data forwarding
+  - [ ] 6.8 Implement submission confirmation and receipt generation
+  - [ ] 6.9 Add error handling for submission failures
+  - [ ] 6.10 Create data export functionality for backup purposes
 
 - [ ] 7.0 Testing, Security and Deployment
   - [ ] 7.1 Set up Jest testing framework and configuration
@@ -89,15 +86,18 @@
   - [ ] 7.12 Create deployment documentation and runbooks
 
 - [ ] 8.0 Future Enhancements (Nice-to-Have)
-  - [ ] 8.1 Research and evaluate YOLO object detection for real-time photo guidance
-  - [ ] 8.2 Integrate ONNX.js for client-side YOLO model inference
-  - [ ] 8.3 Configure Next.js WebAssembly support for ONNX models
-  - [ ] 8.4 Implement Tesseract.js for optical character recognition (OCR)
-  - [ ] 8.5 Add automatic meter reading extraction from photos
-  - [ ] 8.6 Enhance AR guidance with real-time object detection
-  - [ ] 8.7 Implement advanced image quality assessment algorithms
-  - [ ] 8.8 Add automatic photo composition suggestions
-  - [ ] 8.9 Integrate voice commands for hands-free operation
-  - [ ] 8.10 Implement offline AI validation capabilities
+  - [ ] 8.1 Add geolocation capture for each photo
+  - [ ] 8.2 Build digital signature capture component
+  - [ ] 8.3 Implement offline capability for photo storage
+  - [ ] 8.4 Research and evaluate YOLO object detection for real-time photo guidance
+  - [ ] 8.5 Integrate ONNX.js for client-side YOLO model inference
+  - [ ] 8.6 Configure Next.js WebAssembly support for ONNX models
+  - [ ] 8.7 Implement Tesseract.js for optical character recognition (OCR)
+  - [ ] 8.8 Add automatic meter reading extraction from photos
+  - [ ] 8.9 Enhance AR guidance with real-time object detection
+  - [ ] 8.10 Implement advanced image quality assessment algorithms
+  - [ ] 8.11 Add automatic photo composition suggestions
+  - [ ] 8.12 Integrate voice commands for hands-free operation
+  - [ ] 8.13 Implement offline AI validation capabilities
 
 ---

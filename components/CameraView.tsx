@@ -262,8 +262,6 @@ export default function CameraView({
       }
     };
 
-    const borderStyle = config.style === 'dashed' ? 'dashed' : 'solid';
-
     return (
       <div className={styles.containerClass}>
         <div 

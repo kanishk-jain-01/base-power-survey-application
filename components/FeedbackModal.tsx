@@ -1,6 +1,12 @@
 'use client';
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, AlertCircle, RotateCcw, ArrowRight } from 'lucide-react';
 import { ValidationResult } from '@/lib/types';
@@ -22,7 +28,7 @@ export default function FeedbackModal({
   isValidating,
   onRetake,
   onContinue,
-  onOverride
+  onOverride,
 }: FeedbackModalProps) {
   if (isValidating) {
     return (
@@ -34,10 +40,11 @@ export default function FeedbackModal({
               Validating Photo...
             </DialogTitle>
             <DialogDescription>
-              Our AI is analyzing your photo to ensure it meets the survey requirements.
+              Our AI is analyzing your photo to ensure it meets the survey
+              requirements.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="flex justify-center py-6">
             <div className="w-12 h-12 border-4 border-blue-10 border-t-blue-40 rounded-full animate-spin" />
           </div>
@@ -63,7 +70,7 @@ export default function FeedbackModal({
             {isValid ? 'Photo Validated' : 'Photo Issues Detected'}
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           {/* Validation Status */}
           <div className={`p-4 rounded-lg border ${bgColor} ${borderColor}`}>
@@ -75,20 +82,28 @@ export default function FeedbackModal({
                 {Math.round(validation.confidence * 100)}% confidence
               </span>
             </div>
-            <p className="text-body-medium text-grounded font-primary">{validation.feedback}</p>
+            <p className="text-body-medium text-grounded font-primary">
+              {validation.feedback}
+            </p>
           </div>
 
           {/* Extracted Data */}
           {validation.extractedData && (
             <div className="p-3 bg-green-5 border border-green-10 rounded-base">
-              <p className="font-medium text-body-medium font-primary mb-1">Extracted Information:</p>
+              <p className="font-medium text-body-medium font-primary mb-1">
+                Extracted Information:
+              </p>
               <div className="text-body-medium text-grounded font-primary space-y-1">
-                {Object.entries(validation.extractedData).map(([key, value]) => (
-                  <div key={key} className="flex justify-between">
-                    <span className="capitalize">{key.replace(/([A-Z])/g, ' $1')}:</span>
-                    <span className="font-medium">{String(value)}</span>
-                  </div>
-                ))}
+                {Object.entries(validation.extractedData).map(
+                  ([key, value]) => (
+                    <div key={key} className="flex justify-between">
+                      <span className="capitalize">
+                        {key.replace(/([A-Z])/g, ' $1')}:
+                      </span>
+                      <span className="font-medium">{String(value)}</span>
+                    </div>
+                  )
+                )}
               </div>
             </div>
           )}
@@ -97,11 +112,7 @@ export default function FeedbackModal({
           <div className="flex gap-2 pt-2">
             {isValid ? (
               <>
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={onRetake}
-                >
+                <Button variant="outline" className="flex-1" onClick={onRetake}>
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Retake
                 </Button>
@@ -115,10 +126,7 @@ export default function FeedbackModal({
               </>
             ) : (
               <>
-                <Button
-                  className="flex-1"
-                  onClick={onRetake}
-                >
+                <Button className="flex-1" onClick={onRetake}>
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Retake Photo
                 </Button>
@@ -138,7 +146,8 @@ export default function FeedbackModal({
           {/* Helper Text */}
           {!isValid && (
             <p className="text-xs text-gray-500 text-center">
-              For best results, please retake the photo following the guidance provided.
+              For best results, please retake the photo following the guidance
+              provided.
             </p>
           )}
         </div>

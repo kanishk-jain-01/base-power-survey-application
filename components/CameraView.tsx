@@ -15,44 +15,45 @@ interface CameraViewProps {
   onRetry?: () => void;
 }
 
-export default function CameraView({ 
-  photoType, 
-  instruction, 
+export default function CameraView({
+  photoType,
+  instruction,
   onPhotoCapture,
-  onRetry 
+  onRetry,
 }: CameraViewProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  
+
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
   const [capturedFile, setCapturedFile] = useState<File | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
-  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
+  const [validationResult, setValidationResult] =
+    useState<ValidationResult | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
 
   // Initialize camera stream
   const startCamera = useCallback(async () => {
     try {
       setError(null);
-      
+
       const constraints = {
         video: {
           facingMode: 'environment', // Use back camera on mobile
           width: { ideal: 1920 },
-          height: { ideal: 1080 }
-        }
+          height: { ideal: 1080 },
+        },
       };
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       streamRef.current = stream;
-      
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        
+
         // Handle play() promise to avoid interruption errors
         const playPromise = videoRef.current.play();
         if (playPromise !== undefined) {
@@ -73,14 +74,16 @@ export default function CameraView({
       }
     } catch (err) {
       console.error('Error accessing camera:', err);
-      setError('Unable to access camera. Please ensure camera permissions are granted.');
+      setError(
+        'Unable to access camera. Please ensure camera permissions are granted.'
+      );
     }
   }, []);
 
   // Stop camera stream
   const stopCamera = useCallback(() => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
     setIsStreaming(false);
@@ -91,7 +94,7 @@ export default function CameraView({
     if (!videoRef.current || !canvasRef.current || !isStreaming) return;
 
     setIsCapturing(true);
-    
+
     const video = videoRef.current;
     const canvas = canvasRef.current;
     const context = canvas.getContext('2d');
@@ -106,18 +109,22 @@ export default function CameraView({
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     // Convert to blob and create file
-    canvas.toBlob((blob) => {
-      if (blob) {
-        const file = new File([blob], `${photoType}-${Date.now()}.jpg`, {
-          type: 'image/jpeg'
-        });
-        
-        const preview = canvas.toDataURL('image/jpeg', 0.8);
-        setCapturedPhoto(preview);
-        setCapturedFile(file);
-        setIsCapturing(false);
-      }
-    }, 'image/jpeg', 0.8);
+    canvas.toBlob(
+      (blob) => {
+        if (blob) {
+          const file = new File([blob], `${photoType}-${Date.now()}.jpg`, {
+            type: 'image/jpeg',
+          });
+
+          const preview = canvas.toDataURL('image/jpeg', 0.8);
+          setCapturedPhoto(preview);
+          setCapturedFile(file);
+          setIsCapturing(false);
+        }
+      },
+      'image/jpeg',
+      0.8
+    );
   }, [photoType, isStreaming]);
 
   // Validate and confirm captured photo
@@ -127,16 +134,15 @@ export default function CameraView({
     try {
       setIsValidating(true);
       setShowFeedback(true);
-      
+
       // Validate photo with LLM
       const validation = await validatePhotoClient(capturedFile, photoType);
       setValidationResult(validation);
       setIsValidating(false);
-      
     } catch (error) {
       console.error('Validation error:', error);
       setIsValidating(false);
-      
+
       // Fallback: accept photo without validation
       setValidationResult({
         isValid: true,
@@ -178,7 +184,7 @@ export default function CameraView({
   // Initialize camera on mount
   useEffect(() => {
     startCamera();
-    
+
     return () => {
       stopCamera();
     };
@@ -186,8 +192,8 @@ export default function CameraView({
 
   // AR guidance overlay based on photo type
   const renderGuidanceOverlay = () => {
-    const overlayStyles = "absolute inset-0 pointer-events-none";
-    
+    const overlayStyles = 'absolute inset-0 pointer-events-none';
+
     switch (photoType) {
       case 'meter_closeup':
         return (
@@ -199,7 +205,7 @@ export default function CameraView({
             </div>
           </div>
         );
-      
+
       case 'meter_area_wide':
         return (
           <div className={overlayStyles}>
@@ -210,7 +216,7 @@ export default function CameraView({
             </div>
           </div>
         );
-      
+
       default:
         return (
           <div className={overlayStyles}>
@@ -226,8 +232,12 @@ export default function CameraView({
         <div className="space-y-4">
           <div className="text-red-40">
             <Camera className="w-12 h-12 mx-auto mb-2" />
-            <p className="font-medium text-heading-6 font-primary">Camera Error</p>
-            <p className="text-body-medium text-gray-60 font-primary">{error}</p>
+            <p className="font-medium text-heading-6 font-primary">
+              Camera Error
+            </p>
+            <p className="text-body-medium text-gray-60 font-primary">
+              {error}
+            </p>
           </div>
           <Button onClick={startCamera} variant="outline">
             <RotateCcw className="w-4 h-4 mr-2" />
@@ -239,14 +249,16 @@ export default function CameraView({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col h-full">
       {/* Instruction */}
-      <Card className="p-4">
-        <p className="text-body-large text-center font-primary text-grounded">{instruction}</p>
+      <Card className="p-4 flex-shrink-0">
+        <p className="text-body-large text-center font-primary text-grounded">
+          {instruction}
+        </p>
       </Card>
 
       {/* Camera View */}
-      <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
+      <div className="relative flex-1 bg-black rounded-lg overflow-hidden mt-4">
         {/* Video Stream */}
         <video
           ref={videoRef}
@@ -254,7 +266,7 @@ export default function CameraView({
           playsInline
           muted
         />
-        
+
         {/* Captured Photo Overlay */}
         {capturedPhoto && (
           <div className="absolute inset-0 bg-black">
@@ -265,10 +277,10 @@ export default function CameraView({
             />
           </div>
         )}
-        
+
         {/* AR Guidance Overlay */}
         {isStreaming && !capturedPhoto && renderGuidanceOverlay()}
-        
+
         {/* Loading Overlay */}
         {isCapturing && (
           <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -284,7 +296,7 @@ export default function CameraView({
       <canvas ref={canvasRef} className="hidden" />
 
       {/* Controls */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 mt-4 flex-shrink-0">
         {!capturedPhoto ? (
           <>
             <Button
@@ -306,11 +318,7 @@ export default function CameraView({
           </>
         ) : (
           <>
-            <Button
-              onClick={retakePhoto}
-              variant="outline"
-              className="flex-1"
-            >
+            <Button onClick={retakePhoto} variant="outline" className="flex-1">
               <X className="w-4 h-4 mr-2" />
               Retake
             </Button>

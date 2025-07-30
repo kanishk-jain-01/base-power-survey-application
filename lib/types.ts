@@ -15,7 +15,7 @@ export interface Survey {
   status: 'pending' | 'completed' | 'validated' | 'rejected';
   user_signature_data?: string;
   notes?: string;
-  validation_results?: any;
+  validation_results?: Record<string, unknown> | null;
 }
 
 export interface Photo {
@@ -25,10 +25,10 @@ export interface Photo {
   photo_type: PhotoType;
   capture_timestamp: Date;
   geolocation?: string;
-  metadata?: any;
+  metadata?: Record<string, unknown> | null;
 }
 
-export type PhotoType = 
+export type PhotoType =
   | 'meter_closeup'
   | 'meter_area_wide'
   | 'meter_area_right'
@@ -55,7 +55,7 @@ export interface ValidationResult {
   isValid: boolean;
   confidence: number;
   feedback: string;
-  extractedData?: any;
+  extractedData?: Record<string, unknown> | null;
 }
 
 // Survey state for Zustand store
@@ -69,11 +69,14 @@ export interface SurveyState {
     validation?: ValidationResult;
   }>;
   surveyData: Partial<Survey>;
-  
+
   // Actions
   setCustomerEmail: (email: string) => void;
   addPhoto: (photoType: PhotoType, file: File, preview: string) => void;
-  updatePhotoValidation: (photoType: PhotoType, validation: ValidationResult) => void;
+  updatePhotoValidation: (
+    photoType: PhotoType,
+    validation: ValidationResult
+  ) => void;
   nextStep: () => void;
   previousStep: () => void;
   resetSurvey: () => void;

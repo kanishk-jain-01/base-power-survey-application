@@ -8,10 +8,10 @@ interface StepProgressProps {
   stepTitles?: string[];
 }
 
-export default function StepProgress({ 
-  currentStep, 
-  totalSteps, 
-  stepTitles = [] 
+export default function StepProgress({
+  currentStep,
+  totalSteps,
+  stepTitles = [],
 }: StepProgressProps) {
   return (
     <div className="w-full space-y-2">
@@ -34,10 +34,10 @@ export default function StepProgress({
           <div
             key={index}
             className={cn(
-              "w-10 h-10 rounded-full flex items-center justify-center text-body-medium font-primary font-medium transition-colors shadow-base",
+              'w-10 h-10 rounded-full flex items-center justify-center text-body-medium font-primary font-medium transition-colors shadow-base',
               index <= currentStep
-                ? "bg-grounded text-white"
-                : "bg-aluminum text-gray-60"
+                ? 'bg-grounded text-white'
+                : 'bg-aluminum text-gray-60'
             )}
           >
             {index + 1}
@@ -48,7 +48,9 @@ export default function StepProgress({
       {/* Step Title */}
       {stepTitles[currentStep] && (
         <div className="text-center">
-          <p className="text-body-medium text-gray-60 font-primary">{stepTitles[currentStep]}</p>
+          <p className="text-body-medium text-gray-60 font-primary">
+            {stepTitles[currentStep]}
+          </p>
         </div>
       )}
     </div>

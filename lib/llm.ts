@@ -1,12 +1,5 @@
 import { ValidationResult, PhotoType } from '@/lib/types';
 
-// LLM client configuration
-const LLM_CONFIG = {
-  apiKey: process.env.OPENAI_API_KEY || process.env.XAI_API_KEY,
-  baseURL: process.env.LLM_BASE_URL || 'https://api.openai.com/v1',
-  model: process.env.LLM_MODEL || 'gpt-4o-mini',
-};
-
 // Photo validation prompts based on survey criteria
 const getValidationPrompt = (photoType: PhotoType): string => {
   const basePrompt = `You are an expert at validating home energy survey photos. Analyze this image and determine if it meets the criteria for a "${photoType}" photo.
@@ -79,7 +72,7 @@ Criteria for ${photoType}:`;
     breaker_box_area: `
 - Breaker box is visible within larger context
 - Shows location (garage wall, closet, etc.)
-- Includes surrounding area and any obstructions`
+- Includes surrounding area and any obstructions`,
   };
 
   return `${basePrompt}\n${criteria[photoType]}
@@ -131,12 +124,13 @@ export async function validatePhoto(
     return result;
   } catch (error) {
     console.error('Photo validation error:', error);
-    
+
     // Return fallback validation result
     return {
       isValid: true, // Default to valid to not block user
       confidence: 0.5,
-      feedback: 'Unable to validate photo automatically. Please review manually.',
+      feedback:
+        'Unable to validate photo automatically. Please review manually.',
       extractedData: null,
     };
   }
@@ -149,5 +143,3 @@ export async function validatePhotoClient(
 ): Promise<ValidationResult> {
   return validatePhoto(file, photoType);
 }
-
-

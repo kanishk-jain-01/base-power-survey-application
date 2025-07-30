@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ValidationResult, PhotoType } from '@/lib/types';
+import { ValidationResult } from '@/lib/types';
 
 // LLM API configuration
 const LLM_CONFIG = {
@@ -29,26 +29,30 @@ export async function POST(request: NextRequest) {
 
     // Call LLM API for validation
     const validationResult = await callLLMAPI(image, prompt);
-    
+
     return NextResponse.json(validationResult);
   } catch (error) {
     console.error('Validation API error:', error);
-    
+
     // Return fallback validation on error
     return NextResponse.json({
       isValid: true,
       confidence: 0.5,
-      feedback: 'Validation service temporarily unavailable. Photo accepted for manual review.',
+      feedback:
+        'Validation service temporarily unavailable. Photo accepted for manual review.',
       extractedData: null,
     });
   }
 }
 
-async function callLLMAPI(image: string, prompt: string): Promise<ValidationResult> {
+async function callLLMAPI(
+  image: string,
+  prompt: string
+): Promise<ValidationResult> {
   const response = await fetch(`${LLM_CONFIG.baseURL}/chat/completions`, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${LLM_CONFIG.apiKey}`,
+      Authorization: `Bearer ${LLM_CONFIG.apiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
@@ -65,7 +69,7 @@ async function callLLMAPI(image: string, prompt: string): Promise<ValidationResu
               type: 'image_url',
               image_url: {
                 url: `data:image/jpeg;base64,${image}`,
-                detail: 'high'
+                detail: 'high',
               },
             },
           ],
@@ -91,18 +95,22 @@ async function callLLMAPI(image: string, prompt: string): Promise<ValidationResu
     // Clean up markdown code blocks if present
     let cleanContent = content.trim();
     if (cleanContent.startsWith('```json')) {
-      cleanContent = cleanContent.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+      cleanContent = cleanContent
+        .replace(/^```json\s*/, '')
+        .replace(/\s*```$/, '');
     } else if (cleanContent.startsWith('```')) {
       cleanContent = cleanContent.replace(/^```\s*/, '').replace(/\s*```$/, '');
     }
-    
+
     // Parse JSON response from LLM
     const result = JSON.parse(cleanContent);
-    
+
     // Validate the response structure
-    if (typeof result.isValid !== 'boolean' || 
-        typeof result.confidence !== 'number' || 
-        typeof result.feedback !== 'string') {
+    if (
+      typeof result.isValid !== 'boolean' ||
+      typeof result.confidence !== 'number' ||
+      typeof result.feedback !== 'string'
+    ) {
       throw new Error('Invalid LLM response structure');
     }
 
@@ -115,12 +123,13 @@ async function callLLMAPI(image: string, prompt: string): Promise<ValidationResu
   } catch (parseError) {
     console.error('Failed to parse LLM response:', parseError);
     console.error('LLM response content:', content);
-    
+
     // Fallback: try to determine validity from text response
-    const isValid = !content.toLowerCase().includes('invalid') && 
-                   !content.toLowerCase().includes('fail') &&
-                   !content.toLowerCase().includes('error');
-    
+    const isValid =
+      !content.toLowerCase().includes('invalid') &&
+      !content.toLowerCase().includes('fail') &&
+      !content.toLowerCase().includes('error');
+
     return {
       isValid,
       confidence: 0.6,
@@ -129,5 +138,3 @@ async function callLLMAPI(image: string, prompt: string): Promise<ValidationResu
     };
   }
 }
-
-

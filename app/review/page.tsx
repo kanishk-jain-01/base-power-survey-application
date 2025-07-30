@@ -33,10 +33,10 @@ export default function ReviewPage() {
   };
 
   const handleRetakePhoto = (photoType: string) => {
-    // Find the step for this photo type and navigate there
+    // Find the step for this photo type and navigate there with editing context
     const step = SURVEY_STEPS.find((s) => s.photoType === photoType);
     if (step) {
-      router.push(`/step/${step.id}`);
+      router.push(`/step/${step.id}?editingFrom=review`);
     }
   };
 

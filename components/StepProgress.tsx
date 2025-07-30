@@ -8,6 +8,9 @@ interface StepProgressProps {
   totalSteps: number;
   stepTitles?: string[];
   onInfoClick?: () => void;
+  onStepClick?: (index: number) => void;
+  completedSteps?: string[];
+  stepIds?: string[];
 }
 
 export default function StepProgress({
@@ -15,6 +18,9 @@ export default function StepProgress({
   totalSteps,
   stepTitles = [],
   onInfoClick,
+  onStepClick,
+  completedSteps = [],
+  stepIds = [],
 }: StepProgressProps) {
   return (
     <div className="w-full space-y-2">
@@ -33,19 +39,28 @@ export default function StepProgress({
 
       {/* Step Indicators */}
       <div className="flex justify-between">
-        {Array.from({ length: totalSteps }, (_, index) => (
-          <div
-            key={index}
-            className={cn(
-              'w-10 h-10 rounded-full flex items-center justify-center text-body-medium font-primary font-medium transition-colors shadow-base',
-              index <= currentStep
-                ? 'bg-grounded text-white'
-                : 'bg-aluminum text-gray-60'
-            )}
-          >
-            {index + 1}
-          </div>
-        ))}
+        {Array.from({ length: totalSteps }, (_, index) => {
+          const stepId = stepIds[index];
+          const isCompleted = stepId && completedSteps.includes(stepId);
+          const canClick = isCompleted && index !== currentStep && onStepClick;
+          
+          return (
+            <div
+              key={index}
+              onClick={canClick ? () => onStepClick?.(index) : undefined}
+              className={cn(
+                'w-10 h-10 rounded-full flex items-center justify-center text-body-medium font-primary font-medium transition-colors shadow-base',
+                index <= currentStep
+                  ? 'bg-grounded text-white'
+                  : 'bg-aluminum text-gray-60',
+                canClick && 'cursor-pointer hover:ring-2 hover:ring-grounded hover:ring-opacity-50'
+              )}
+              aria-label={canClick ? `Go to step ${index + 1}` : `Step ${index + 1}`}
+            >
+              {index + 1}
+            </div>
+          );
+        })}
       </div>
 
       {/* Step Title */}

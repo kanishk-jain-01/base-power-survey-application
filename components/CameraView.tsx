@@ -14,14 +14,16 @@ import { getOverlayConfig, getOverlayStyles } from '@/lib/photoOverlays';
 interface CameraViewProps {
   photoType: PhotoType;
   onPhotoCapture: (file: File, preview: string) => void;
-  onRetry?: () => void;
+  onSkip?: () => void;
+  showSkip?: boolean;
   onAmperageConfirm?: (amperage: number) => void;
 }
 
 export default function CameraView({
   photoType,
   onPhotoCapture,
-  onRetry,
+  onSkip,
+  showSkip = false,
   onAmperageConfirm,
 }: CameraViewProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -368,7 +370,8 @@ export default function CameraView({
           capturedPhoto={capturedPhoto}
           isStreaming={isStreaming}
           isCapturing={isCapturing}
-          onRetry={onRetry}
+          onSkip={onSkip}
+          showSkip={showSkip}
           onCapturePhoto={capturePhoto}
           onRetakePhoto={retakePhoto}
           onConfirmPhoto={confirmPhoto}
@@ -384,7 +387,8 @@ export default function CameraView({
         capturedPhoto={capturedPhoto}
         isStreaming={isStreaming}
         isCapturing={isCapturing}
-        onRetry={onRetry}
+        onSkip={onSkip}
+        showSkip={showSkip}
         onCapturePhoto={capturePhoto}
         onRetakePhoto={retakePhoto}
         onConfirmPhoto={confirmPhoto}

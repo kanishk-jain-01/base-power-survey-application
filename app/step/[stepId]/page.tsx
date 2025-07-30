@@ -1,16 +1,14 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import CameraView from '@/components/CameraView';
 import StepProgress from '@/components/StepProgress';
 import InstructionModal from '@/components/InstructionModal';
 import {
   getStepById,
   getNextStepId,
-  getPreviousStepId,
   getStepProgress,
   SURVEY_STEPS,
 } from '@/lib/surveySteps';
@@ -19,10 +17,21 @@ import { useSurveyStore } from '@/stores/surveyStore';
 export default function SurveyStepPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const stepId = params.stepId as string;
   const stepConfig = getStepById(stepId);
-  const { addPhoto, skipStep, setMainDisconnectAmperage } = useSurveyStore();
+  const { addPhoto, skipStep, setMainDisconnectAmperage, completedSteps, setEditingStepId } = useSurveyStore();
   const [showInstructionModal, setShowInstructionModal] = useState(true);
+  
+  // Check if we're in editing mode
+  const isEditing = searchParams.get('editingFrom') === 'review';
+
+  // Set editing state when component mounts
+  useEffect(() => {
+    if (isEditing) {
+      setEditingStepId(stepId);
+    }
+  }, [isEditing, stepId, setEditingStepId]);
 
   if (!stepConfig) {
     return (
@@ -38,12 +47,20 @@ export default function SurveyStepPage() {
 
   const progress = getStepProgress(stepId);
   const stepTitles = SURVEY_STEPS.map((step) => step.title);
+  const stepIds = SURVEY_STEPS.map((step) => step.id);
 
   const handlePhotoCapture = (file: File, preview: string) => {
     // Add photo to survey state
-    addPhoto(stepConfig.photoType, file, preview);
+    addPhoto(stepConfig.photoType, file, preview, stepId);
 
-    // Navigate to next step or review
+    // If we're editing, go back to review
+    if (isEditing) {
+      setEditingStepId(null);
+      router.push('/review');
+      return;
+    }
+
+    // Otherwise, navigate to next step or review
     const nextStepId = getNextStepId(stepId);
     if (nextStepId) {
       router.push(`/step/${nextStepId}`);
@@ -52,20 +69,18 @@ export default function SurveyStepPage() {
     }
   };
 
-  const handleBack = () => {
-    const previousStepId = getPreviousStepId(stepId);
-    if (previousStepId) {
-      router.push(`/step/${previousStepId}`);
-    } else {
-      router.push('/');
-    }
-  };
-
   const handleSkip = () => {
     // Add step to skipped list
     skipStep(stepId);
     
-    // Navigate to next step or review
+    // If we're editing, go back to review
+    if (isEditing) {
+      setEditingStepId(null);
+      router.push('/review');
+      return;
+    }
+    
+    // Otherwise, navigate to next step or review
     const nextStepId = getNextStepId(stepId);
     if (nextStepId) {
       router.push(`/step/${nextStepId}`);
@@ -78,6 +93,11 @@ export default function SurveyStepPage() {
     setMainDisconnectAmperage(amperage);
   };
 
+  const handleStepClick = (index: number) => {
+    const targetStepId = stepIds[index];
+    router.push(`/step/${targetStepId}`);
+  };
+
   return (
     <div className="flex flex-col h-dvh portrait:overflow-hidden landscape:min-h-dvh landscape:overflow-auto">
       {/* Header with Progress */}
@@ -87,6 +107,9 @@ export default function SurveyStepPage() {
           totalSteps={progress.total}
           stepTitles={stepTitles}
           onInfoClick={() => setShowInstructionModal(true)}
+          onStepClick={handleStepClick}
+          completedSteps={completedSteps}
+          stepIds={stepIds}
         />
       </div>
 
@@ -95,22 +118,10 @@ export default function SurveyStepPage() {
         <CameraView
           photoType={stepConfig.photoType}
           onPhotoCapture={handlePhotoCapture}
-          onRetry={handleBack}
+          onSkip={handleSkip}
+          showSkip={stepConfig.isConditional}
           onAmperageConfirm={handleAmperageConfirm}
         />
-        
-        {/* Skip button for conditional steps */}
-        {stepConfig.isConditional && (
-          <div className="flex justify-center mt-4">
-            <Button
-              variant="ghost"
-              onClick={handleSkip}
-              className="text-sm"
-            >
-              Skip This Step
-            </Button>
-          </div>
-        )}
       </div>
 
       {/* Instruction Modal */}

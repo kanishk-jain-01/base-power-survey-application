@@ -71,9 +71,9 @@ export default function FeedbackModal({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 flex flex-col items-center">
           {/* Validation Status */}
-          <div className={`p-4 rounded-lg border ${bgColor} ${borderColor}`}>
+          <div className={`p-4 rounded-lg border ${bgColor} ${borderColor} w-full`}>
             <div className="flex items-center justify-between mb-2">
               <span className="font-medium">
                 {isValid ? 'Validation Passed' : 'Validation Failed'}
@@ -89,7 +89,7 @@ export default function FeedbackModal({
 
           {/* Extracted Data */}
           {validation.extractedData && (
-            <div className="p-3 bg-green-5 border border-green-10 rounded-base">
+            <div className="p-3 bg-green-5 border border-green-10 rounded-base w-full">
               <p className="font-medium text-body-medium font-primary mb-1">
                 Extracted Information:
               </p>
@@ -109,7 +109,7 @@ export default function FeedbackModal({
           )}
 
           {/* Action Buttons */}
-          <div className="flex gap-2 pt-2">
+          <div className="flex gap-2 pt-2 w-full">
             {isValid ? (
               <>
                 <Button variant="outline" className="flex-1" onClick={onRetake}>

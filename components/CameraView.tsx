@@ -249,16 +249,16 @@ export default function CameraView({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col h-full">
       {/* Instruction */}
-      <Card className="p-4">
+      <Card className="p-4 flex-shrink-0">
         <p className="text-body-large text-center font-primary text-grounded">
           {instruction}
         </p>
       </Card>
 
       {/* Camera View */}
-      <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
+      <div className="relative flex-1 bg-black rounded-lg overflow-hidden mt-4">
         {/* Video Stream */}
         <video
           ref={videoRef}
@@ -296,7 +296,7 @@ export default function CameraView({
       <canvas ref={canvasRef} className="hidden" />
 
       {/* Controls */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 mt-4 flex-shrink-0">
         {!capturedPhoto ? (
           <>
             <Button

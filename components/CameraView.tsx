@@ -3,21 +3,20 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Camera, RotateCcw, Check, X } from 'lucide-react';
+import { Camera, RotateCcw } from 'lucide-react';
 import { PhotoType, ValidationResult } from '@/lib/types';
 import FeedbackModal from '@/components/FeedbackModal';
+import CameraControls from '@/components/CameraControls';
 import { validatePhotoClient } from '@/lib/llm';
 
 interface CameraViewProps {
   photoType: PhotoType;
-  instruction: string;
   onPhotoCapture: (file: File, preview: string) => void;
   onRetry?: () => void;
 }
 
 export default function CameraView({
   photoType,
-  instruction,
   onPhotoCapture,
   onRetry,
 }: CameraViewProps) {
@@ -188,7 +187,7 @@ export default function CameraView({
     return () => {
       stopCamera();
     };
-  }, []); // Remove dependencies to prevent multiple initializations
+  }, [startCamera, stopCamera]);
 
   // AR guidance overlay based on photo type
   const renderGuidanceOverlay = () => {
@@ -249,16 +248,9 @@ export default function CameraView({
   }
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Instruction */}
-      <Card className="p-4 flex-shrink-0">
-        <p className="text-body-large text-center font-primary text-grounded">
-          {instruction}
-        </p>
-      </Card>
-
+    <div className="relative h-full">
       {/* Camera View */}
-      <div className="relative flex-1 bg-black rounded-lg overflow-hidden mt-4">
+      <div className="relative h-full md:aspect-video md:max-h-[70vh] md:mx-auto bg-black rounded-lg overflow-hidden">
         {/* Video Stream */}
         <video
           ref={videoRef}
@@ -290,49 +282,34 @@ export default function CameraView({
             </div>
           </div>
         )}
+
+        {/* Mobile Controls - Overlaid at bottom */}
+        <CameraControls
+          capturedPhoto={capturedPhoto}
+          isStreaming={isStreaming}
+          isCapturing={isCapturing}
+          onRetry={onRetry}
+          onCapturePhoto={capturePhoto}
+          onRetakePhoto={retakePhoto}
+          onConfirmPhoto={confirmPhoto}
+          className="absolute bottom-4 left-4 right-4 md:hidden"
+        />
       </div>
 
       {/* Canvas for photo capture (hidden) */}
       <canvas ref={canvasRef} className="hidden" />
 
-      {/* Controls */}
-      <div className="flex gap-2 mt-4 flex-shrink-0">
-        {!capturedPhoto ? (
-          <>
-            <Button
-              onClick={onRetry}
-              variant="outline"
-              className="flex-1"
-              disabled={!isStreaming}
-            >
-              Back
-            </Button>
-            <Button
-              onClick={capturePhoto}
-              className="flex-1"
-              disabled={!isStreaming || isCapturing}
-            >
-              <Camera className="w-4 h-4 mr-2" />
-              Capture Photo
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button onClick={retakePhoto} variant="outline" className="flex-1">
-              <X className="w-4 h-4 mr-2" />
-              Retake
-            </Button>
-            <Button
-              onClick={confirmPhoto}
-              variant="secondary"
-              className="flex-1"
-            >
-              <Check className="w-4 h-4 mr-2" />
-              Use Photo
-            </Button>
-          </>
-        )}
-      </div>
+      {/* Desktop Controls - Fixed at bottom */}
+      <CameraControls
+        capturedPhoto={capturedPhoto}
+        isStreaming={isStreaming}
+        isCapturing={isCapturing}
+        onRetry={onRetry}
+        onCapturePhoto={capturePhoto}
+        onRetakePhoto={retakePhoto}
+        onConfirmPhoto={confirmPhoto}
+        className="hidden md:fixed md:bottom-6 md:left-4 md:right-4 md:flex md:max-w-md md:mx-auto"
+      />
 
       {/* Validation Feedback Modal */}
       <FeedbackModal

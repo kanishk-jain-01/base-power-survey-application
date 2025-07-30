@@ -70,16 +70,20 @@ export interface SurveyState {
   }>;
   surveyData: Partial<Survey>;
   skippedSteps: string[];
+  completedSteps: string[];
+  editingStepId?: string | null;
   mainDisconnectAmperage?: number;
 
   // Actions
   setCustomerEmail: (email: string) => void;
-  addPhoto: (photoType: PhotoType, file: File, preview: string) => void;
+  addPhoto: (photoType: PhotoType, file: File, preview: string, stepId: string) => void;
   updatePhotoValidation: (
     photoType: PhotoType,
     validation: ValidationResult
   ) => void;
   skipStep: (stepId: string) => void;
+  markStepCompleted: (stepId: string) => void;
+  setEditingStepId: (stepId: string | null) => void;
   setMainDisconnectAmperage: (amperage: number) => void;
   nextStep: () => void;
   previousStep: () => void;

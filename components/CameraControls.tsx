@@ -7,7 +7,8 @@ interface CameraControlsProps {
   capturedPhoto: string | null;
   isStreaming: boolean;
   isCapturing: boolean;
-  onRetry?: () => void;
+  onSkip?: () => void;
+  showSkip?: boolean;
   onCapturePhoto: () => void;
   onRetakePhoto: () => void;
   onConfirmPhoto: () => void;
@@ -18,7 +19,8 @@ export default function CameraControls({
   capturedPhoto,
   isStreaming,
   isCapturing,
-  onRetry,
+  onSkip,
+  showSkip = false,
   onCapturePhoto,
   onRetakePhoto,
   onConfirmPhoto,
@@ -28,17 +30,19 @@ export default function CameraControls({
     <div className={`flex gap-2 ${className}`}>
       {!capturedPhoto ? (
         <>
-          <Button
-            onClick={onRetry}
-            variant="outline"
-            className="flex-1"
-            disabled={!isStreaming}
-          >
-            Back
-          </Button>
+          {showSkip && (
+            <Button
+              onClick={onSkip}
+              variant="outline"
+              className="flex-1"
+              disabled={!isStreaming}
+            >
+              Skip This Step
+            </Button>
+          )}
           <Button
             onClick={onCapturePhoto}
-            className="flex-1"
+            className={showSkip ? "flex-1" : "w-full"}
             disabled={!isStreaming || isCapturing}
           >
             <Camera className="w-4 h-4 mr-2" />

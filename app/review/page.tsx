@@ -14,7 +14,7 @@ import { useSurveyStore } from '@/stores/surveyStore';
 import { SURVEY_STEPS } from '@/lib/surveySteps';
 
 export default function ReviewPage() {
-  const { photos, customerEmail, resetSurvey } = useSurveyStore();
+  const { photos, customerEmail, resetSurvey, skippedSteps, mainDisconnectAmperage } = useSurveyStore();
   const router = useRouter();
 
   const handleEditSurvey = () => {
@@ -41,7 +41,15 @@ export default function ReviewPage() {
   };
 
   const validPhotos = photos.filter((p) => p.file && p.preview);
-  const isComplete = validPhotos.length >= 5; // Minimum required photos
+  
+  // Calculate required photos: total steps minus conditional steps that were skipped
+  const totalSteps = SURVEY_STEPS.length;
+  const conditionalSteps = SURVEY_STEPS.filter(s => s.isConditional);
+  const skippedConditionalSteps = skippedSteps.filter(stepId => 
+    conditionalSteps.some(s => s.id === stepId)
+  );
+  const requiredPhotos = totalSteps - skippedConditionalSteps.length;
+  const isComplete = validPhotos.length >= requiredPhotos;
 
   return (
     <div className="min-h-screen p-4">
@@ -65,15 +73,44 @@ export default function ReviewPage() {
                 <p className="text-gray-60 text-body-large">{customerEmail}</p>
               </div>
 
+              {/* Main Disconnect Amperage */}
+              {mainDisconnectAmperage && (
+                <div>
+                  <p className="font-medium text-grounded text-body-large">
+                    Main Disconnect Amperage:
+                  </p>
+                  <p className="text-gray-60 text-body-large">{mainDisconnectAmperage} A</p>
+                </div>
+              )}
+
+              {/* Skipped Steps */}
+              {skippedSteps.length > 0 && (
+                <div>
+                  <p className="font-medium text-grounded text-body-large">
+                    Skipped Steps:
+                  </p>
+                  <div className="text-gray-60 text-body-large">
+                    {skippedSteps.map((stepId) => {
+                      const step = SURVEY_STEPS.find(s => s.id === stepId);
+                      return (
+                        <div key={stepId} className="text-sm">
+                          • {step?.title || stepId} - No photo required
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Photos Grid */}
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <p className="font-medium text-grounded text-body-large">
-                    Photos Captured: {validPhotos.length}
+                    Photos Captured: {validPhotos.length} / {requiredPhotos}
                   </p>
                   {!isComplete && (
                     <p className="text-body-medium text-orange-40">
-                      Minimum 5 photos required
+                      {requiredPhotos - validPhotos.length} more required
                     </p>
                   )}
                 </div>

@@ -21,7 +21,7 @@ export default function SurveyStepPage() {
   const router = useRouter();
   const stepId = params.stepId as string;
   const stepConfig = getStepById(stepId);
-  const { addPhoto, skipStep } = useSurveyStore();
+  const { addPhoto, skipStep, setMainDisconnectAmperage } = useSurveyStore();
   const [showInstructionModal, setShowInstructionModal] = useState(true);
 
   if (!stepConfig) {
@@ -74,6 +74,10 @@ export default function SurveyStepPage() {
     }
   };
 
+  const handleAmperageConfirm = (amperage: number) => {
+    setMainDisconnectAmperage(amperage);
+  };
+
   return (
     <div className="flex flex-col h-dvh portrait:overflow-hidden landscape:min-h-dvh landscape:overflow-auto">
       {/* Header with Progress */}
@@ -92,6 +96,7 @@ export default function SurveyStepPage() {
           photoType={stepConfig.photoType}
           onPhotoCapture={handlePhotoCapture}
           onRetry={handleBack}
+          onAmperageConfirm={handleAmperageConfirm}
         />
         
         {/* Skip button for conditional steps */}

@@ -17,12 +17,12 @@ export default function StepProgress({
     <div className="w-full space-y-2">
       {/* Progress Bar */}
       <div className="flex items-center space-x-2">
-        <span className="text-sm text-gray-600">
+        <span className="text-body-medium text-gray-60 font-primary">
           Step {currentStep + 1} of {totalSteps}
         </span>
-        <div className="flex-1 bg-gray-200 rounded-full h-2">
+        <div className="flex-1 bg-aluminum rounded-full h-3">
           <div
-            className="bg-blue-40 h-2 rounded-full transition-all duration-300"
+            className="bg-livewire h-3 rounded-full transition-all duration-300"
             style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
           />
         </div>
@@ -34,10 +34,10 @@ export default function StepProgress({
           <div
             key={index}
             className={cn(
-              "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors",
+              "w-10 h-10 rounded-full flex items-center justify-center text-body-medium font-primary font-medium transition-colors shadow-base",
               index <= currentStep
-                ? "bg-blue-40 text-white"
-                : "bg-gray-200 text-gray-600"
+                ? "bg-grounded text-white"
+                : "bg-aluminum text-gray-60"
             )}
           >
             {index + 1}
@@ -48,7 +48,7 @@ export default function StepProgress({
       {/* Step Title */}
       {stepTitles[currentStep] && (
         <div className="text-center">
-          <p className="text-sm text-gray-600">{stepTitles[currentStep]}</p>
+          <p className="text-body-medium text-gray-60 font-primary">{stepTitles[currentStep]}</p>
         </div>
       )}
     </div>

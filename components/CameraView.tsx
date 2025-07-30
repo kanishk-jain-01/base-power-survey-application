@@ -4,7 +4,9 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Camera, RotateCcw, Check, X } from 'lucide-react';
-import { PhotoType } from '@/lib/types';
+import { PhotoType, ValidationResult } from '@/lib/types';
+import FeedbackModal from '@/components/FeedbackModal';
+import { validatePhotoClient } from '@/lib/llm';
 
 interface CameraViewProps {
   photoType: PhotoType;
@@ -26,7 +28,11 @@ export default function CameraView({
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
+  const [capturedFile, setCapturedFile] = useState<File | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
+  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
 
   // Initialize camera stream
   const startCamera = useCallback(async () => {
@@ -46,8 +52,24 @@ export default function CameraView({
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
-        setIsStreaming(true);
+        
+        // Handle play() promise to avoid interruption errors
+        const playPromise = videoRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              setIsStreaming(true);
+            })
+            .catch((error) => {
+              // Handle play interruption gracefully
+              if (error.name !== 'AbortError') {
+                console.error('Video play error:', error);
+                setError('Unable to start camera preview');
+              }
+            });
+        } else {
+          setIsStreaming(true);
+        }
       }
     } catch (err) {
       console.error('Error accessing camera:', err);
@@ -92,30 +114,66 @@ export default function CameraView({
         
         const preview = canvas.toDataURL('image/jpeg', 0.8);
         setCapturedPhoto(preview);
+        setCapturedFile(file);
         setIsCapturing(false);
       }
     }, 'image/jpeg', 0.8);
   }, [photoType, isStreaming]);
 
-  // Confirm captured photo
-  const confirmPhoto = useCallback(() => {
-    if (!capturedPhoto || !canvasRef.current) return;
+  // Validate and confirm captured photo
+  const confirmPhoto = useCallback(async () => {
+    if (!capturedPhoto || !capturedFile) return;
 
-    canvasRef.current.toBlob((blob) => {
-      if (blob) {
-        const file = new File([blob], `${photoType}-${Date.now()}.jpg`, {
-          type: 'image/jpeg'
-        });
-        onPhotoCapture(file, capturedPhoto);
-      }
-    }, 'image/jpeg', 0.8);
-  }, [capturedPhoto, photoType, onPhotoCapture]);
+    try {
+      setIsValidating(true);
+      setShowFeedback(true);
+      
+      // Validate photo with LLM
+      const validation = await validatePhotoClient(capturedFile, photoType);
+      setValidationResult(validation);
+      setIsValidating(false);
+      
+    } catch (error) {
+      console.error('Validation error:', error);
+      setIsValidating(false);
+      
+      // Fallback: accept photo without validation
+      setValidationResult({
+        isValid: true,
+        confidence: 0.5,
+        feedback: 'Validation unavailable. Photo accepted for manual review.',
+        extractedData: null,
+      });
+    }
+  }, [capturedPhoto, capturedFile, photoType]);
 
   // Retake photo
   const retakePhoto = useCallback(() => {
     setCapturedPhoto(null);
+    setCapturedFile(null);
     setIsCapturing(false);
+    setValidationResult(null);
+    setShowFeedback(false);
   }, []);
+
+  // Handle validation feedback actions
+  const handleContinue = useCallback(() => {
+    if (capturedFile && capturedPhoto) {
+      onPhotoCapture(capturedFile, capturedPhoto);
+      setShowFeedback(false);
+    }
+  }, [capturedFile, capturedPhoto, onPhotoCapture]);
+
+  const handleOverride = useCallback(() => {
+    if (capturedFile && capturedPhoto) {
+      onPhotoCapture(capturedFile, capturedPhoto);
+      setShowFeedback(false);
+    }
+  }, [capturedFile, capturedPhoto, onPhotoCapture]);
+
+  const handleRetakeFromModal = useCallback(() => {
+    retakePhoto();
+  }, [retakePhoto]);
 
   // Initialize camera on mount
   useEffect(() => {
@@ -124,7 +182,7 @@ export default function CameraView({
     return () => {
       stopCamera();
     };
-  }, [startCamera, stopCamera]);
+  }, []); // Remove dependencies to prevent multiple initializations
 
   // AR guidance overlay based on photo type
   const renderGuidanceOverlay = () => {
@@ -134,8 +192,8 @@ export default function CameraView({
       case 'meter_closeup':
         return (
           <div className={overlayStyles}>
-            <div className="absolute inset-4 border-2 border-blue-40 rounded-lg">
-              <div className="absolute -top-8 left-0 bg-blue-40 text-white px-2 py-1 rounded text-sm">
+            <div className="absolute inset-4 border-2 border-grounded rounded-base">
+              <div className="absolute -top-8 left-0 bg-grounded text-white px-2 py-1 rounded-base text-body-small font-primary">
                 Frame the meter display clearly
               </div>
             </div>
@@ -145,8 +203,8 @@ export default function CameraView({
       case 'meter_area_wide':
         return (
           <div className={overlayStyles}>
-            <div className="absolute inset-8 border-2 border-dashed border-blue-40 rounded-lg">
-              <div className="absolute -top-8 left-0 bg-blue-40 text-white px-2 py-1 rounded text-sm">
+            <div className="absolute inset-8 border-2 border-dashed border-grounded rounded-base">
+              <div className="absolute -top-8 left-0 bg-grounded text-white px-2 py-1 rounded-base text-body-small font-primary">
                 Show entire meter area
               </div>
             </div>
@@ -156,7 +214,7 @@ export default function CameraView({
       default:
         return (
           <div className={overlayStyles}>
-            <div className="absolute inset-6 border-2 border-blue-40 rounded-lg opacity-50" />
+            <div className="absolute inset-6 border-2 border-grounded rounded-base opacity-50" />
           </div>
         );
     }
@@ -166,10 +224,10 @@ export default function CameraView({
     return (
       <Card className="p-6 text-center">
         <div className="space-y-4">
-          <div className="text-red-600">
+          <div className="text-red-40">
             <Camera className="w-12 h-12 mx-auto mb-2" />
-            <p className="font-medium">Camera Error</p>
-            <p className="text-sm text-gray-600">{error}</p>
+            <p className="font-medium text-heading-6 font-primary">Camera Error</p>
+            <p className="text-body-medium text-gray-60 font-primary">{error}</p>
           </div>
           <Button onClick={startCamera} variant="outline">
             <RotateCcw className="w-4 h-4 mr-2" />
@@ -184,7 +242,7 @@ export default function CameraView({
     <div className="space-y-4">
       {/* Instruction */}
       <Card className="p-4">
-        <p className="text-body-large text-center">{instruction}</p>
+        <p className="text-body-large text-center font-primary text-grounded">{instruction}</p>
       </Card>
 
       {/* Camera View */}
@@ -239,7 +297,7 @@ export default function CameraView({
             </Button>
             <Button
               onClick={capturePhoto}
-              className="flex-1 bg-blue-40 hover:bg-blue-90"
+              className="flex-1"
               disabled={!isStreaming || isCapturing}
             >
               <Camera className="w-4 h-4 mr-2" />
@@ -258,7 +316,8 @@ export default function CameraView({
             </Button>
             <Button
               onClick={confirmPhoto}
-              className="flex-1 bg-green-600 hover:bg-green-700"
+              variant="secondary"
+              className="flex-1"
             >
               <Check className="w-4 h-4 mr-2" />
               Use Photo
@@ -266,6 +325,17 @@ export default function CameraView({
           </>
         )}
       </div>
+
+      {/* Validation Feedback Modal */}
+      <FeedbackModal
+        isOpen={showFeedback}
+        onClose={() => setShowFeedback(false)}
+        validation={validationResult}
+        isValidating={isValidating}
+        onRetake={handleRetakeFromModal}
+        onContinue={handleContinue}
+        onOverride={handleOverride}
+      />
     </div>
   );
 }

@@ -38,14 +38,14 @@ export default function ReviewPage() {
   const isComplete = validPhotos.length >= 5; // Minimum required photos
 
   return (
-    <div className="min-h-screen bg-blue-5 p-4">
-      <div className="max-w-2xl mx-auto space-y-4">
-        <Card>
+    <div className="min-h-screen p-4">
+      <div className="max-w-2xl mx-auto space-y-6">
+        <Card className="shadow-base-lg">
           <CardHeader>
-            <CardTitle className="text-heading-4 text-blue-90">
+            <CardTitle className="text-heading-2 text-grounded">
               Review Survey Data
             </CardTitle>
-            <CardDescription className="text-body-large">
+            <CardDescription className="text-body-large text-gray-60">
               Review your captured photos and data before submission
             </CardDescription>
           </CardHeader>
@@ -53,18 +53,18 @@ export default function ReviewPage() {
             <div className="space-y-6">
               {/* Survey Info */}
               <div>
-                <p className="font-medium text-gray-900">Customer Email:</p>
-                <p className="text-gray-600">{customerEmail}</p>
+                <p className="font-medium text-grounded text-body-large">Customer Email:</p>
+                <p className="text-gray-60 text-body-large">{customerEmail}</p>
               </div>
               
               {/* Photos Grid */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <p className="font-medium text-gray-900">
+                  <p className="font-medium text-grounded text-body-large">
                     Photos Captured: {validPhotos.length}
                   </p>
                   {!isComplete && (
-                    <p className="text-sm text-orange-600">
+                    <p className="text-body-medium text-orange-40">
                       Minimum 5 photos required
                     </p>
                   )}
@@ -83,8 +83,8 @@ export default function ReviewPage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <p>No photos captured yet</p>
+                  <div className="text-center py-8 text-gray-60">
+                    <p className="text-body-large">No photos captured yet</p>
                     <Button 
                       variant="outline" 
                       className="mt-2"
@@ -106,9 +106,10 @@ export default function ReviewPage() {
                   Edit Survey
                 </Button>
                 <Button 
-                  className="flex-1 bg-blue-40 hover:bg-blue-90"
+                  className="flex-1"
                   onClick={handleSubmitSurvey}
                   disabled={!isComplete}
+                  size="lg"
                 >
                   Submit Survey
                 </Button>

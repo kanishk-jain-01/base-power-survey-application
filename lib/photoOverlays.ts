@@ -58,7 +58,12 @@ export const OVERLAY_CONFIG: Record<PhotoType, OverlayConfig> = {
     label: 'Corner to corner wall view'
   },
   
-
+  area_behind_fence: {
+    inset: 32,
+    style: 'dashed',
+    show: true,
+    label: 'Show fence and area behind it'
+  },
   
   // Label shots - need tight, readable framing
   ac_unit_label: {

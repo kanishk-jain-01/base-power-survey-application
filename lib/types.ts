@@ -34,6 +34,7 @@ export type PhotoType =
   | 'meter_area_right'
   | 'meter_area_left'
   | 'adjacent_wall'
+  | 'area_behind_fence'
   | 'ac_unit_label'
   | 'second_ac_unit_label'
   | 'breaker_box_interior'
@@ -68,6 +69,8 @@ export interface SurveyState {
     validation?: ValidationResult;
   }>;
   surveyData: Partial<Survey>;
+  skippedSteps: string[];
+  mainDisconnectAmperage?: number;
 
   // Actions
   setCustomerEmail: (email: string) => void;
@@ -76,6 +79,8 @@ export interface SurveyState {
     photoType: PhotoType,
     validation: ValidationResult
   ) => void;
+  skipStep: (stepId: string) => void;
+  setMainDisconnectAmperage: (amperage: number) => void;
   nextStep: () => void;
   previousStep: () => void;
   resetSurvey: () => void;

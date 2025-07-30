@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Camera, RotateCcw } from 'lucide-react';
 import { PhotoType, ValidationResult } from '@/lib/types';
 import FeedbackModal from '@/components/FeedbackModal';
+import DataConfirmModal from '@/components/DataConfirmModal';
 import CameraControls from '@/components/CameraControls';
 import { validatePhotoClient } from '@/lib/llm';
 import { getOverlayConfig, getOverlayStyles } from '@/lib/photoOverlays';
@@ -14,12 +15,14 @@ interface CameraViewProps {
   photoType: PhotoType;
   onPhotoCapture: (file: File, preview: string) => void;
   onRetry?: () => void;
+  onAmperageConfirm?: (amperage: number) => void;
 }
 
 export default function CameraView({
   photoType,
   onPhotoCapture,
   onRetry,
+  onAmperageConfirm,
 }: CameraViewProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -34,6 +37,7 @@ export default function CameraView({
   const [validationResult, setValidationResult] =
     useState<ValidationResult | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [showDataConfirm, setShowDataConfirm] = useState(false);
 
   // Initialize camera stream
   const startCamera = useCallback(async () => {
@@ -139,6 +143,14 @@ export default function CameraView({
       const validation = await validatePhotoClient(capturedFile, photoType);
       setValidationResult(validation);
       setIsValidating(false);
+
+      // Check if this is main disconnect and has extracted amperage
+      if (photoType === 'main_disconnect_switch' && 
+          validation.extractedData?.amperage && 
+          typeof validation.extractedData.amperage === 'number') {
+        setShowFeedback(false);
+        setShowDataConfirm(true);
+      }
     } catch (error) {
       console.error('Validation error:', error);
       setIsValidating(false);
@@ -160,6 +172,7 @@ export default function CameraView({
     setIsCapturing(false);
     setValidationResult(null);
     setShowFeedback(false);
+    setShowDataConfirm(false);
   }, []);
 
   // Handle validation feedback actions
@@ -176,6 +189,20 @@ export default function CameraView({
       setShowFeedback(false);
     }
   }, [capturedFile, capturedPhoto, onPhotoCapture]);
+
+  // Handle data confirmation modal actions
+  const handleAmperageConfirm = useCallback((amperage: number) => {
+    if (capturedFile && capturedPhoto) {
+      onAmperageConfirm?.(amperage);
+      onPhotoCapture(capturedFile, capturedPhoto);
+      setShowDataConfirm(false);
+    }
+  }, [capturedFile, capturedPhoto, onPhotoCapture, onAmperageConfirm]);
+
+  const handleDataRetake = useCallback(() => {
+    setShowDataConfirm(false);
+    retakePhoto();
+  }, [retakePhoto]);
 
   const handleRetakeFromModal = useCallback(() => {
     retakePhoto();
@@ -373,6 +400,15 @@ export default function CameraView({
         onRetake={handleRetakeFromModal}
         onContinue={handleContinue}
         onOverride={handleOverride}
+      />
+
+      {/* Data Confirmation Modal for Main Disconnect */}
+      <DataConfirmModal
+        isOpen={showDataConfirm}
+        onClose={() => setShowDataConfirm(false)}
+        extractedAmperage={validationResult?.extractedData?.amperage as number}
+        onConfirm={handleAmperageConfirm}
+        onRetake={handleDataRetake}
       />
     </div>
   );

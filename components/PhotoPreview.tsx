@@ -102,21 +102,23 @@ export default function PhotoPreview({
               <Button
                 size="sm"
                 variant="outline"
-                className="flex-1 text-xs"
+                className="flex-1 p-1.5 min-w-0"
                 onClick={() => setIsModalOpen(true)}
+                title="View photo"
               >
-                <Eye className="w-3 h-3 mr-1" />
-                View
+                <Eye className="w-3 h-3 shrink-0" />
+                <span className="hidden xs:inline ml-1 text-xs truncate">View</span>
               </Button>
               {onRetake && (
                 <Button
                   size="sm"
                   variant="outline"
-                  className="flex-1 text-xs"
+                  className="flex-1 p-1.5 min-w-0"
                   onClick={onRetake}
+                  title="Retake photo"
                 >
-                  <RotateCcw className="w-3 h-3 mr-1" />
-                  Retake
+                  <RotateCcw className="w-3 h-3 shrink-0" />
+                  <span className="hidden xs:inline ml-1 text-xs truncate">Retake</span>
                 </Button>
               )}
             </div>

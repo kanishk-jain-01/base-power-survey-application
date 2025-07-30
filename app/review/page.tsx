@@ -150,31 +150,34 @@ export default function ReviewPage() {
 
               {/* Actions */}
               <div className="space-y-3 pt-4 border-t">
-                <div className="flex gap-2">
+                {/* Primary Action */}
+                <Button
+                  className="w-full"
+                  onClick={handleSubmitSurvey}
+                  disabled={!isComplete}
+                  size="lg"
+                >
+                  Submit Survey
+                </Button>
+                
+                {/* Secondary Actions */}
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Button
                     variant="outline"
-                    className="flex-1"
+                    className="w-full sm:flex-1"
                     onClick={handleEditSurvey}
                   >
                     Edit Survey
                   </Button>
                   <Button
-                    className="flex-1"
-                    onClick={handleSubmitSurvey}
-                    disabled={!isComplete}
-                    size="lg"
+                    variant="destructive"
+                    className="w-full sm:flex-1"
+                    onClick={handleClearSurvey}
+                    size="sm"
                   >
-                    Submit Survey
+                    Clear Survey
                   </Button>
                 </div>
-                <Button
-                  variant="destructive"
-                  className="w-full"
-                  onClick={handleClearSurvey}
-                  size="sm"
-                >
-                  Clear Survey
-                </Button>
               </div>
             </div>
           </CardContent>

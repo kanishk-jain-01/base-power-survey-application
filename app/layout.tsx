@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import PageTransition from '@/components/PageTransition';
 
 export const metadata: Metadata = {
   title: 'Base Power Survey App',
@@ -14,7 +15,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-primary bg-aluminum text-grounded antialiased">
-        <main className="min-h-dvh">{children}</main>
+        <main className="min-h-dvh">
+          <PageTransition>{children}</PageTransition>
+        </main>
       </body>
     </html>
   );

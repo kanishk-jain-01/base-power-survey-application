@@ -61,6 +61,7 @@ export interface ValidationResult {
 // Survey state for Zustand store
 export interface SurveyState {
   currentStep: number;
+  furthestStepIndex: number;
   customerEmail: string;
   photos: Array<{
     photoType: PhotoType;
@@ -85,6 +86,7 @@ export interface SurveyState {
   markStepCompleted: (stepId: string) => void;
   setEditingStepId: (stepId: string | null) => void;
   setMainDisconnectAmperage: (amperage: number) => void;
+  setFurthestStepIndex: (index: number) => void;
   nextStep: () => void;
   previousStep: () => void;
   resetSurvey: () => void;

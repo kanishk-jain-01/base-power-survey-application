@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { Info } from 'lucide-react';
+import { useSurveyStore } from '@/stores/surveyStore';
 
 interface StepProgressProps {
   currentStep: number;
@@ -22,6 +23,7 @@ export default function StepProgress({
   completedSteps = [],
   stepIds = [],
 }: StepProgressProps) {
+  const furthestStepIndex = useSurveyStore(state => state.furthestStepIndex);
   return (
     <div className="w-full space-y-2">
       {/* Progress Bar */}
@@ -42,7 +44,7 @@ export default function StepProgress({
         {Array.from({ length: totalSteps }, (_, index) => {
           const stepId = stepIds[index];
           const isCompleted = stepId && completedSteps.includes(stepId);
-          const canClick = isCompleted && index !== currentStep && onStepClick;
+          const canClick = index <= furthestStepIndex && index !== currentStep && onStepClick;
           
           return (
             <div
@@ -50,14 +52,23 @@ export default function StepProgress({
               onClick={canClick ? () => onStepClick?.(index) : undefined}
               className={cn(
                 'w-10 h-10 rounded-full flex items-center justify-center text-body-medium font-primary font-medium transition-colors shadow-base',
-                index <= currentStep
-                  ? 'bg-grounded text-white'
-                  : 'bg-aluminum text-gray-60',
+                // Current step - blue with ring
+                index === currentStep && 'bg-livewire text-white ring-2 ring-livewire ring-opacity-30',
+                // Completed steps - green
+                isCompleted && index !== currentStep && 'bg-green-600 text-white',
+                // Reachable but incomplete - gray, clickable
+                !isCompleted && index <= furthestStepIndex && index !== currentStep && 'bg-gray-400 text-white',
+                // Locked steps - light gray
+                index > furthestStepIndex && 'bg-aluminum text-gray-60',
                 canClick && 'cursor-pointer hover:ring-2 hover:ring-grounded hover:ring-opacity-50'
               )}
-              aria-label={canClick ? `Go to step ${index + 1}` : `Step ${index + 1}`}
+              aria-label={
+                canClick 
+                  ? `Go to step ${index + 1}${isCompleted ? ' (completed)' : ' (incomplete)'}`
+                  : `Step ${index + 1}`
+              }
             >
-              {index + 1}
+              {isCompleted && index !== currentStep ? '✓' : index + 1}
             </div>
           );
         })}

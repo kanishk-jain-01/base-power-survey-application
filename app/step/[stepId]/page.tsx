@@ -13,8 +13,10 @@ import {
   SURVEY_STEPS,
 } from '@/lib/surveySteps';
 import { useSurveyStore } from '@/stores/surveyStore';
+import { useHydration } from '@/lib/useHydration';
 
 export default function SurveyStepPage() {
+  const isHydrated = useHydration();
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -53,6 +55,18 @@ export default function SurveyStepPage() {
 
     return () => clearTimeout(timer);
   }, [stepId]);
+
+  // Show loading during hydration
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-livewire mx-auto mb-4"></div>
+          <p>Loading step...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!stepConfig || !progress) {
     return (

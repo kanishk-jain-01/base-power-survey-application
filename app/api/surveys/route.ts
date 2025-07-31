@@ -78,6 +78,17 @@ export async function POST(req: NextRequest) {
       // Process and upload photos
       for (const photo of payload.photos) {
         try {
+          // Validate base64 data
+          if (!photo.base64Data || typeof photo.base64Data !== 'string') {
+            throw new Error(`Invalid base64 data for photo type: ${photo.photoType}`)
+          }
+          
+          // Validate base64 format
+          const base64Pattern = /^[A-Za-z0-9+/]*={0,2}$/
+          if (!base64Pattern.test(photo.base64Data)) {
+            throw new Error(`Invalid base64 format for photo type: ${photo.photoType}`)
+          }
+          
           // Generate S3 key
           const timestamp = Date.now()
           const key = `survey/${survey.survey_id}/${photo.photoType}_${timestamp}.jpg`

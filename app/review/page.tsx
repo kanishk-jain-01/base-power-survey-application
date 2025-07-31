@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import PhotoPreview from '@/components/PhotoPreview';
 import { useSurveyStore } from '@/stores/surveyStore';
 import { SURVEY_STEPS } from '@/lib/surveySteps';
+import { fileToBase64 } from '@/lib/fileUtils';
 import { Edit2, Check, X } from 'lucide-react';
 
 export default function ReviewPage() {
@@ -21,6 +22,7 @@ export default function ReviewPage() {
   const router = useRouter();
   const [isEditingAmperage, setIsEditingAmperage] = useState(false);
   const [editAmperageValue, setEditAmperageValue] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleEditSurvey = () => {
     // Navigate back to first step to edit
@@ -35,13 +37,54 @@ export default function ReviewPage() {
   };
 
   const handleSubmitSurvey = async () => {
-    // TODO: Implement survey submission to API
-    console.log('Submitting survey:', { customerEmail, photos });
+    if (!customerEmail) {
+      alert('Customer email is required');
+      return;
+    }
 
-    // For now, just show success and reset
-    alert('Survey submitted successfully!');
-    resetSurvey();
-    router.push('/');
+    setIsSubmitting(true);
+    
+    try {
+      // Convert photos to base64 format for API
+      const photoData = await Promise.all(
+        validPhotos.map(async (photo) => ({
+          photoType: photo.photoType,
+          base64Data: await fileToBase64(photo.file),
+          validation: photo.validation
+        }))
+      );
+
+      // Submit to API
+      const response = await fetch('/api/surveys', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customerEmail,
+          photos: photoData,
+          skippedSteps,
+          mainDisconnectAmperage,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to submit survey');
+      }
+
+      const result = await response.json();
+      
+      alert(`Survey submitted successfully! Survey ID: ${result.surveyId}`);
+      resetSurvey();
+      router.push('/');
+      
+    } catch (error) {
+      console.error('Survey submission error:', error);
+      alert(`Failed to submit survey: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleRetakePhoto = (photoType: string) => {
@@ -220,10 +263,10 @@ export default function ReviewPage() {
                 <Button
                   className="w-full"
                   onClick={handleSubmitSurvey}
-                  disabled={!isComplete}
+                  disabled={!isComplete || isSubmitting}
                   size="lg"
                 >
-                  Submit Survey
+                  {isSubmitting ? 'Submitting...' : 'Submit Survey'}
                 </Button>
                 
                 {/* Secondary Actions */}

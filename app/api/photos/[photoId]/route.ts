@@ -6,7 +6,7 @@ import { pool } from '@/lib/db'
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { photoId: string } }
+  { params }: { params: Promise<{ photoId: string }> }
 ) {
   // Verify API key for external access
   const apiKey = req.headers.get('x-internal-api-key')
@@ -16,7 +16,7 @@ export async function GET(
   }
 
   try {
-    const { photoId } = params
+    const { photoId } = await params
 
     // Get photo metadata from database
     const client = await pool.connect()

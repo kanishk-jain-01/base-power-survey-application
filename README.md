@@ -171,31 +171,6 @@ The application will be available at `http://localhost:3000`.
 - **Environment secrets** never committed to version control
 - **SSL/TLS encryption** for database connections
 
-### Recommended IAM Policy
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:PutObject",
-        "s3:GetObject"
-      ],
-      "Resource": "arn:aws:s3:::your-bucket-name/*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "rds-db:connect"
-      ],
-      "Resource": "arn:aws:rds-db:region:account:dbuser:db-instance/*"
-    }
-  ]
-}
-```
-
 ## 🚢 Deployment
 
 ### Vercel (Recommended)

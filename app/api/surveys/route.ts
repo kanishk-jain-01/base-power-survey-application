@@ -35,21 +35,10 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    console.log('Received survey submission request')
     const payload: SurveySubmission = await req.json()
-    console.log('Payload received:', {
-      customerEmail: payload.customerEmail,
-      photosCount: payload.photos?.length,
-      skippedStepsCount: payload.skippedSteps?.length,
-      mainDisconnectAmperage: payload.mainDisconnectAmperage
-    })
     
     // Validate required fields
     if (!payload.customerEmail || !Array.isArray(payload.photos)) {
-      console.error('Missing required fields:', { 
-        hasEmail: !!payload.customerEmail, 
-        photosIsArray: Array.isArray(payload.photos) 
-      })
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
@@ -87,28 +76,16 @@ export async function POST(req: NextRequest) {
       )
 
       // Process and upload photos
-      console.log(`Processing ${payload.photos.length} photos`)
       for (const photo of payload.photos) {
         try {
-          console.log(`Processing photo: ${photo.photoType}, base64 length: ${photo.base64Data?.length}`)
-          
           // Validate base64 data
           if (!photo.base64Data || typeof photo.base64Data !== 'string') {
-            console.error(`Invalid base64 data for ${photo.photoType}:`, { 
-              hasData: !!photo.base64Data, 
-              type: typeof photo.base64Data 
-            })
             throw new Error(`Invalid base64 data for photo type: ${photo.photoType}`)
           }
           
           // Validate base64 format
           const base64Pattern = /^[A-Za-z0-9+/]*={0,2}$/
           if (!base64Pattern.test(photo.base64Data)) {
-            console.error(`Invalid base64 format for ${photo.photoType}:`, {
-              length: photo.base64Data.length,
-              firstChars: photo.base64Data.substring(0, 20),
-              lastChars: photo.base64Data.substring(photo.base64Data.length - 20)
-            })
             throw new Error(`Invalid base64 format for photo type: ${photo.photoType}`)
           }
           

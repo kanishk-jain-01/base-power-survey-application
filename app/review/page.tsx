@@ -56,32 +56,17 @@ export default function ReviewPage() {
       return;
     }
 
-    console.log('Starting survey submission...');
     setIsSubmitting(true);
     
     try {
-      console.log(`Converting ${validPhotos.length} photos to base64...`);
-      
       // Convert photos to base64 format for API
       const photoData = await Promise.all(
-        validPhotos.map(async (photo, index) => {
-          console.log(`Converting photo ${index + 1}/${validPhotos.length}: ${photo.photoType}`);
-          try {
-            const base64Data = await fileToBase64(photo.file);
-            console.log(`Successfully converted photo ${photo.photoType}, base64 length: ${base64Data.length}`);
-            return {
-              photoType: photo.photoType,
-              base64Data,
-              validation: photo.validation
-            };
-          } catch (error) {
-            console.error(`Failed to convert photo ${photo.photoType}:`, error);
-            throw new Error(`Failed to process photo ${photo.photoType}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-          }
-        })
+        validPhotos.map(async (photo) => ({
+          photoType: photo.photoType,
+          base64Data: await fileToBase64(photo.file),
+          validation: photo.validation
+        }))
       );
-
-      console.log('All photos converted successfully, sending to API...');
 
       // Submit to API
       const response = await fetch('/api/surveys', {
@@ -97,16 +82,12 @@ export default function ReviewPage() {
         }),
       });
 
-      console.log('API response status:', response.status);
-
       if (!response.ok) {
         const error = await response.json();
-        console.error('API error response:', error);
         throw new Error(error.error || 'Failed to submit survey');
       }
 
       const result = await response.json();
-      console.log('Survey submission successful:', result);
       
       alert(`Survey submitted successfully! Survey ID: ${result.surveyId}`);
       resetSurvey();

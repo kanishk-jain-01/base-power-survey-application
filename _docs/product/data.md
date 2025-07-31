@@ -26,28 +26,34 @@ Based on the survey requirements, the primary entities are:
 
   - `geolocation` (Overall survey location)
 
+  - `main_disconnect_amperage` (Critical: amperage number from main disconnect switch, e.g., 100, 150, 200)
+
   - `status` (e.g., 'pending', 'completed', 'validated', 'rejected')
 
   - `user_signature_data` (Digital signature)
 
   - `notes` (Any additional notes from the surveyor)
 
-  - `validation_results` (JSON/Text field for AI validation output)
+  - `validation_results` (JSON/Text field for overall survey-level AI validation)
 
 - **Photo:** Represents an individual photo captured during the survey. Each photo is associated with a specific survey and a type.
   - `photo_id` (Primary Key)
 
   - `survey_id` (Foreign Key to Survey)
 
-  - `s3_url` (URL to the stored image in AWS S3)
+  - `s3_key` (S3 object key for the stored image)
 
-  - `photo_type` (e.g., 'meter_closeup', 'ac_unit_wide', 'breaker_box_interior', 'conditional')
+  - `s3_url` (Full URL to the stored image in AWS S3)
+
+  - `photo_type` (Enum: 'meter_closeup', 'meter_area_wide', 'meter_area_right', 'meter_area_left', 'adjacent_wall', 'area_behind_fence', 'ac_unit_label', 'second_ac_unit_label', 'breaker_box_interior', 'main_disconnect_switch', 'breaker_box_area')
 
   - `capture_timestamp`
 
   - `geolocation` (Specific photo location, if different from survey)
 
-  - `metadata` (JSON/Text field for EXIF data, AI analysis, etc.)
+  - `validation_json` (JSON field for AI validation results: confidence, isValid, feedback, extractedData)
+
+  - `metadata` (JSON field for EXIF data and other technical metadata)
 
 ## 2. Relationships
 
@@ -70,30 +76,34 @@ CUSTOMER ||--o{ SURVEY : has
 SURVEY ||--o{ PHOTO : contains
 
     CUSTOMER {
-        VARCHAR customer_id PK
+        UUID customer_id PK
         VARCHAR email UK "Used for keying survey data"
         VARCHAR name
         VARCHAR phone_number
+        TIMESTAMP created_at
     }
 
     SURVEY {
-        VARCHAR survey_id PK
-        VARCHAR customer_id FK
+        UUID survey_id PK
+        UUID customer_id FK
         TIMESTAMP start_timestamp
         TIMESTAMP completion_timestamp
         VARCHAR geolocation "Overall survey location"
+        INT main_disconnect_amperage "Critical amperage value"
         VARCHAR status "e.g., 'pending', 'completed', 'validated'"
         TEXT user_signature_data
         TEXT notes
-        JSONB validation_results "AI validation output"
+        JSONB validation_results "Overall survey AI validation"
     }
 
     PHOTO {
-        VARCHAR photo_id PK
-        VARCHAR survey_id FK
-        VARCHAR s3_url "URL to AWS S3"
-        VARCHAR photo_type "e.g., 'meter_closeup', 'ac_unit_wide'"
+        UUID photo_id PK
+        UUID survey_id FK
+        VARCHAR s3_key "S3 object key"
+        VARCHAR s3_url "Full URL to AWS S3"
+        photo_type_enum photo_type "11 specific photo types"
         TIMESTAMP capture_timestamp
         VARCHAR geolocation "Specific photo location"
-        JSONB metadata "EXIF, AI analysis, etc."
+        JSONB validation_json "AI validation results per photo"
+        JSONB metadata "EXIF and technical data"
     }

@@ -20,7 +20,7 @@ export default function SurveyStepPage() {
   const searchParams = useSearchParams();
   const stepId = params.stepId as string;
   const stepConfig = getStepById(stepId);
-  const { addPhoto, skipStep, setMainDisconnectAmperage, completedSteps, setEditingStepId } = useSurveyStore();
+  const { addPhoto, skipStep, setMainDisconnectAmperage, completedSteps, setEditingStepId, setFurthestStepIndex } = useSurveyStore();
   const [showInstructionModal, setShowInstructionModal] = useState(false);
   
   // Check if we're in editing mode
@@ -33,6 +33,18 @@ export default function SurveyStepPage() {
     }
   }, [isEditing, stepId, setEditingStepId]);
 
+  // Calculate progress data early
+  const progress = stepConfig ? getStepProgress(stepId) : null;
+  const stepTitles = SURVEY_STEPS.map((step) => step.title);
+  const stepIds = SURVEY_STEPS.map((step) => step.id);
+
+  // Update furthest step reached when visiting this step
+  useEffect(() => {
+    if (!isEditing && progress) {
+      setFurthestStepIndex(progress.current);
+    }
+  }, [progress?.current, setFurthestStepIndex, isEditing]);
+
   // Show instruction modal after page transition completes
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -42,7 +54,7 @@ export default function SurveyStepPage() {
     return () => clearTimeout(timer);
   }, [stepId]);
 
-  if (!stepConfig) {
+  if (!stepConfig || !progress) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Card>
@@ -53,10 +65,6 @@ export default function SurveyStepPage() {
       </div>
     );
   }
-
-  const progress = getStepProgress(stepId);
-  const stepTitles = SURVEY_STEPS.map((step) => step.title);
-  const stepIds = SURVEY_STEPS.map((step) => step.id);
 
   const handlePhotoCapture = (file: File, preview: string) => {
     // Add photo to survey state

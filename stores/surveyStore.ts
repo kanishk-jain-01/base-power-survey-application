@@ -6,6 +6,7 @@ export const useSurveyStore = create<SurveyState>()(
   persist(
     (set, get) => ({
   currentStep: 0,
+  furthestStepIndex: 0,
   customerEmail: '',
   photos: [],
   surveyData: {},
@@ -58,6 +59,9 @@ export const useSurveyStore = create<SurveyState>()(
   setMainDisconnectAmperage: (amperage: number) =>
     set({ mainDisconnectAmperage: amperage }),
 
+  setFurthestStepIndex: (index: number) =>
+    set((state) => ({ furthestStepIndex: Math.max(state.furthestStepIndex, index) })),
+
   nextStep: () => set((state) => ({ currentStep: state.currentStep + 1 })),
 
   previousStep: () =>
@@ -68,6 +72,7 @@ export const useSurveyStore = create<SurveyState>()(
   resetSurvey: () =>
     set({
       currentStep: 0,
+      furthestStepIndex: 0,
       customerEmail: '',
       photos: [],
       surveyData: {},
@@ -83,6 +88,7 @@ export const useSurveyStore = create<SurveyState>()(
       // User will need to retake photos if they refresh, but other state is preserved
       partialize: (state) => ({
         currentStep: state.currentStep,
+        furthestStepIndex: state.furthestStepIndex,
         customerEmail: state.customerEmail,
         surveyData: state.surveyData,
         skippedSteps: state.skippedSteps,

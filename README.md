@@ -251,14 +251,32 @@ Response: {
   "surveys": [
     {
       "survey_id": "uuid",
-      "customer": { "email": "...", "name": "..." },
+      "email": "customer@example.com",
+      "start_timestamp": "2024-01-01T00:00:00Z",
       "completion_timestamp": "2024-01-01T00:00:00Z",
       "main_disconnect_amperage": 200,
-      "photos": [...]
+      "status": "completed",
+      "photos": [
+        {
+          "photo_id": "uuid",
+          "photo_type": "meter_closeup",
+          "s3_url": "https://bucket.s3.region.amazonaws.com/path/to/photo.jpg",
+          "presignedUrl": "https://bucket.s3.region.amazonaws.com/path/to/photo.jpg?X-Amz-Signature=...",
+          "urlExpiresIn": 3600,
+          "capture_timestamp": "2024-01-01T00:00:00Z",
+          "validation_json": {
+            "isValid": true,
+            "confidence": 0.95,
+            "feedback": "Clear meter reading visible"
+          }
+        }
+      ]
     }
   ]
 }
 ```
+
+**Note:** `presignedUrl` provides secure, temporary access to photos (expires in 1 hour). Use this URL to view/download photos.
 
 ## 📞 Contact
 

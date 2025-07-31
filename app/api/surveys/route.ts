@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { uploadBuffer, getS3Url } from '@/lib/aws'
+import { GetObjectCommand } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { uploadBuffer, getS3Url, s3, S3_BUCKET } from '@/lib/aws'
 import { pool } from '@/lib/db'
 
 interface PhotoData {
@@ -177,11 +179,12 @@ export async function GET(req: NextRequest) {
         [email]
       )
 
-      // Get photos for each survey
+      // Get photos for each survey and generate presigned URLs
       for (const survey of surveys) {
         const { rows: photos } = await client.query(
           `SELECT 
              photo_id,
+             s3_key,
              s3_url,
              photo_type,
              capture_timestamp,
@@ -194,7 +197,34 @@ export async function GET(req: NextRequest) {
           [survey.survey_id]
         )
         
-        survey.photos = photos
+        // Generate presigned URLs for each photo
+        const photosWithPresignedUrls = await Promise.all(
+          photos.map(async (photo) => {
+            try {
+              const command = new GetObjectCommand({
+                Bucket: S3_BUCKET,
+                Key: photo.s3_key,
+              })
+              
+              const presignedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 })
+              
+              return {
+                ...photo,
+                presignedUrl,
+                urlExpiresIn: 3600
+              }
+            } catch (error) {
+              console.error(`Error generating presigned URL for photo ${photo.photo_id}:`, error)
+              return {
+                ...photo,
+                presignedUrl: null,
+                error: 'Failed to generate download URL'
+              }
+            }
+          })
+        )
+        
+        survey.photos = photosWithPresignedUrls
       }
 
       return NextResponse.json({ surveys }, { status: 200 })

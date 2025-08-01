@@ -96,6 +96,8 @@ export const useSurveyStore = create<SurveyState>()(
         editingStepId: state.editingStepId,
         mainDisconnectAmperage: state.mainDisconnectAmperage,
       }),
+      // Skip hydration to prevent server/client mismatch
+      skipHydration: true,
     }
   )
 );

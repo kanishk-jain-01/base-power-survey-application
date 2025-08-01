@@ -14,15 +14,28 @@ import { Input } from '@/components/ui/input';
 import PhotoPreview from '@/components/PhotoPreview';
 import { useSurveyStore } from '@/stores/surveyStore';
 import { SURVEY_STEPS } from '@/lib/surveySteps';
-
+import { useHydration } from '@/lib/useHydration';
 import { Edit2, Check, X } from 'lucide-react';
 
 export default function ReviewPage() {
+  const isHydrated = useHydration();
   const { photos, customerEmail, resetSurvey, skippedSteps, mainDisconnectAmperage, setMainDisconnectAmperage } = useSurveyStore();
   const router = useRouter();
   const [isEditingAmperage, setIsEditingAmperage] = useState(false);
   const [editAmperageValue, setEditAmperageValue] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Show loading state during hydration to prevent mismatches
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-livewire mx-auto mb-4"></div>
+          <p>Loading survey data...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleEditSurvey = () => {
     // Navigate back to first step to edit

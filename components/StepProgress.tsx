@@ -3,6 +3,7 @@
 import { cn } from '@/lib/utils';
 import { Info } from 'lucide-react';
 import { useSurveyStore } from '@/stores/surveyStore';
+import { useHydration } from '@/lib/useHydration';
 
 interface StepProgressProps {
   currentStep: number;
@@ -23,9 +24,14 @@ export default function StepProgress({
   completedSteps = [],
   stepIds = [],
 }: StepProgressProps) {
+  const isHydrated = useHydration();
   const furthestStepIndex = useSurveyStore(state => state.furthestStepIndex);
+  
+  // Use default values during hydration to prevent mismatches
+  const safeFurthestStepIndex = isHydrated ? furthestStepIndex : 0;
+  
   return (
-    <div className="w-full space-y-2">
+    <div className="w-full space-y-2" suppressHydrationWarning>
       {/* Progress Bar */}
       <div className="flex items-center space-x-2">
         <span className="text-body-medium text-gray-60 font-primary">
@@ -44,7 +50,7 @@ export default function StepProgress({
         {Array.from({ length: totalSteps }, (_, index) => {
           const stepId = stepIds[index];
           const isCompleted = stepId && completedSteps.includes(stepId);
-          const canClick = index <= furthestStepIndex && index !== currentStep && onStepClick;
+          const canClick = index <= safeFurthestStepIndex && index !== currentStep && onStepClick;
           
           return (
             <div
@@ -57,9 +63,9 @@ export default function StepProgress({
                 // Completed steps - green
                 isCompleted && index !== currentStep && 'bg-green-600 text-white',
                 // Reachable but incomplete - gray, clickable
-                !isCompleted && index <= furthestStepIndex && index !== currentStep && 'bg-gray-400 text-white',
+                !isCompleted && index <= safeFurthestStepIndex && index !== currentStep && 'bg-gray-400 text-white',
                 // Locked steps - light gray
-                index > furthestStepIndex && 'bg-aluminum text-gray-60',
+                index > safeFurthestStepIndex && 'bg-aluminum text-gray-60',
                 canClick && 'cursor-pointer hover:ring-2 hover:ring-grounded hover:ring-opacity-50'
               )}
               aria-label={

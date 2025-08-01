@@ -76,39 +76,39 @@ export async function POST(req: NextRequest) {
       )
 
       // Process photo metadata (files already uploaded to S3)
-      for (const photo of payload.photos) {
-        try {
-          // Validate S3 key
-          if (!photo.s3Key || typeof photo.s3Key !== 'string') {
-            throw new Error(`Invalid S3 key for photo type: ${photo.photoType}`)
-          }
-          
-          // Validate S3 key format (should be from our temp upload)
-          if (!photo.s3Key.startsWith('survey/tmp/')) {
-            throw new Error(`Invalid S3 key format for photo type: ${photo.photoType}`)
-          }
-          
-          // Move from temp to final location (copy and delete old)
-          // For now, we'll just use the temp key - in production you might want to move it
-          const s3Url = getS3Url(photo.s3Key)
-          
-          // Insert photo record
-          await client.query(
-            `INSERT INTO photos(survey_id, s3_key, s3_url, photo_type, validation_json)
-             VALUES($1, $2, $3, $4, $5)`,
-            [
-              survey.survey_id,
-              photo.s3Key, // Use the temp key for now
-              s3Url,
-              photo.photoType,
-              photo.validation ? JSON.stringify(photo.validation) : null
-            ]
-          )
-        } catch (photoError) {
-          console.error(`Error processing photo ${photo.photoType}:`, photoError)
-          throw photoError
-        }
-      }
+   for (const photo of payload.photos) {
+     try {
+       // Validate S3 key
+       if (!photo.s3Key || typeof photo.s3Key !== 'string') {
+         throw new Error(`Invalid S3 key for photo type: ${photo.photoType}`)
+       }
+
+       // Validate S3 key format (should be from our temp upload)
+       if (!photo.s3Key.startsWith('survey/tmp/')) {
+         throw new Error(`Invalid S3 key format for photo type: ${photo.photoType}`)
+       }
+
+       // Move from temp to final location (copy and delete old)
+       // For now, we'll just use the temp key - in production you might want to move it
+       const s3Url = getS3Url(photo.s3Key)
+
+       // Insert photo record
+       await client.query(
+         `INSERT INTO photos(survey_id, s3_key, s3_url, photo_type, validation_json)
+          VALUES($1, $2, $3, $4, $5)`,
+         [
+           survey.survey_id,
+           photo.s3Key, // Use the temp key for now
+           s3Url,
+           photo.photoType,
+           photo.validation ? JSON.stringify(photo.validation) : null
+         ]
+       )
+     } catch (photoError) {
+       console.error(`Error processing photo ${photo.photoType}:`, photoError)
+       throw photoError
+     }
+   }
 
       // Insert skipped steps
       for (const stepId of payload.skippedSteps) {

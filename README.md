@@ -1,18 +1,6 @@
 # ⚡️ Base Power Survey Application
 
-
-A mobile-first Next.js application designed for energy company to assess customer sites for battery system installations. The app guides users through capturing 11 specific photo types, validates them with AI, extracts critical electrical data (amperage readings), and securely stores everything in an AWS-backed infrastructure.
-
-## ✨ Key Features
-
-- 📸 **Step-by-step camera workflow** with guided photo capture for 11 specific electrical components
-- 🧠 **AI validation** using OpenAI Vision for photo quality and content verification
-- 📝 **Automatic amperage detection** from main disconnect switch photos
-- ☁️ **Secure AWS storage** with S3 for photos and PostgreSQL RDS for metadata
-- 🔒 **End-to-end security** with encrypted uploads and authenticated REST APIs
-- 📱 **Mobile-first UI** built with Tailwind CSS and ShadCN components
-- 📊 **Data retrieval API** for survey results keyed by customer email
-- 🎯 **Smart skip logic** for conditional photo requirements
+ The app guides users through capturing 11 specific photo types, validates them with AI, extracts critical electrical data (amperage readings), and securely stores everything in an AWS-backed infrastructure.
 
 ## 🏗 Architecture Overview
 
@@ -174,24 +162,12 @@ The application will be available at `http://localhost:3000`.
 
 ## 🚢 Deployment
 
-### Vercel (Recommended)
+### Vercel 
 
 1. **Connect repository** to Vercel
 2. **Add environment variables** in project settings
 3. **Deploy** - automatic builds on push to main
 
-### Self-Hosted
-
-```dockerfile
-FROM node:20-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-EXPOSE 3000
-CMD ["npm", "start"]
-```
 
 ## ⚙️ AWS Setup Guide
 
@@ -257,64 +233,6 @@ AWS_S3_BUCKET=your-bucket-name
 # API Keys
 OPENAI_API_KEY=sk-proj-...
 INTERNAL_API_KEY=your-64-char-random-string
-```
-
-## 🧪 API Reference
-
-### Photo Upload Flow
-
-#### 1. Get Presigned Upload URLs
-```http
-POST /api/surveys/photos
-Content-Type: application/json
-
-{
-  "photos": [
-    { "photoType": "meter_closeup" },
-    { "photoType": "panel_main" }
-  ]
-}
-
-Response: {
-  "urls": [
-    {
-      "photoType": "meter_closeup",
-      "key": "survey/tmp/uuid_meter_closeup.jpg",
-      "uploadUrl": "https://bucket.s3.region.amazonaws.com/survey/tmp/uuid_meter_closeup.jpg?X-Amz-Signature=..."
-    }
-  ]
-}
-```
-
-#### 2. Upload Photos to S3
-```http
-PUT {uploadUrl}
-Content-Type: image/jpeg
-
-[Raw image file data]
-```
-
-#### 3. Submit Survey
-```http
-POST /api/surveys
-Content-Type: application/json
-
-{
-  "customerEmail": "customer@example.com",
-  "photos": [
-    {
-      "photoType": "meter_closeup",
-      "s3Key": "survey/tmp/uuid_meter_closeup.jpg",
-      "validation": {
-        "isValid": true,
-        "confidence": 0.95,
-        "feedback": "Clear meter reading visible"
-      }
-    }
-  ],
-  "skippedSteps": ["ac_unit_label"],
-  "mainDisconnectAmperage": 200
-}
 ```
 
 ### Retrieve Surveys

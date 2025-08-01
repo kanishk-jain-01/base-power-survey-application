@@ -6,9 +6,7 @@ export const pool = new Pool({
   idleTimeoutMillis: 10000,
   connectionTimeoutMillis: 2000,
   // SSL configuration: always use SSL, but skip cert validation in development
-  ssl: process.env.NODE_ENV === 'development'
-    ? { rejectUnauthorized: false }
-    : { rejectUnauthorized: true }
+  ssl: { rejectUnauthorized: true } 
 })
 
 // Test connection on startup

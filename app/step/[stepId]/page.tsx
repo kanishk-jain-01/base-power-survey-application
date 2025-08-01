@@ -14,6 +14,7 @@ import {
 } from '@/lib/surveySteps';
 import { useSurveyStore } from '@/stores/surveyStore';
 import { useHydration } from '@/lib/useHydration';
+import { ValidationResult } from '@/lib/types';
 
 export default function SurveyStepPage() {
   const isHydrated = useHydration();
@@ -22,7 +23,7 @@ export default function SurveyStepPage() {
   const searchParams = useSearchParams();
   const stepId = params.stepId as string;
   const stepConfig = getStepById(stepId);
-  const { addPhoto, skipStep, setMainDisconnectAmperage, completedSteps, setEditingStepId, setFurthestStepIndex } = useSurveyStore();
+  const { addPhoto, updatePhotoValidation, skipStep, setMainDisconnectAmperage, completedSteps, setEditingStepId, setFurthestStepIndex } = useSurveyStore();
   const [showInstructionModal, setShowInstructionModal] = useState(false);
   
   // Check if we're in editing mode
@@ -80,9 +81,14 @@ export default function SurveyStepPage() {
     );
   }
 
-  const handlePhotoCapture = (file: File, preview: string) => {
+  const handlePhotoCapture = (file: File, preview: string, validation?: ValidationResult) => {
     // Add photo to survey state
     addPhoto(stepConfig.photoType, file, preview, stepId);
+
+    // Update photo validation if provided
+    if (validation) {
+      updatePhotoValidation(stepConfig.photoType, validation);
+    }
 
     // If we're editing, go back to review
     if (isEditing) {

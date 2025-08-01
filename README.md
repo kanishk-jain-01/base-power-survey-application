@@ -194,7 +194,40 @@ CMD ["npm", "start"]
 
 ## 🧪 API Reference
 
-### Submit Survey
+### Photo Upload Flow
+
+#### 1. Get Presigned Upload URLs
+```http
+POST /api/surveys/photos
+Content-Type: application/json
+
+{
+  "photos": [
+    { "photoType": "meter_closeup" },
+    { "photoType": "panel_main" }
+  ]
+}
+
+Response: {
+  "urls": [
+    {
+      "photoType": "meter_closeup",
+      "key": "survey/tmp/uuid_meter_closeup.jpg",
+      "uploadUrl": "https://bucket.s3.region.amazonaws.com/survey/tmp/uuid_meter_closeup.jpg?X-Amz-Signature=..."
+    }
+  ]
+}
+```
+
+#### 2. Upload Photos to S3
+```http
+PUT {uploadUrl}
+Content-Type: image/jpeg
+
+[Raw image file data]
+```
+
+#### 3. Submit Survey
 ```http
 POST /api/surveys
 Content-Type: application/json
@@ -204,7 +237,7 @@ Content-Type: application/json
   "photos": [
     {
       "photoType": "meter_closeup",
-      "base64Data": "base64-encoded-image",
+      "s3Key": "survey/tmp/uuid_meter_closeup.jpg",
       "validation": {
         "isValid": true,
         "confidence": 0.95,

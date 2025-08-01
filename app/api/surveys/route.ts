@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { GetObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import { uploadBuffer, getS3Url, s3, S3_BUCKET } from '@/lib/aws'
+import { getS3Url, s3, S3_BUCKET } from '@/lib/aws'
 import { pool } from '@/lib/db'
 
 interface PhotoData {
   photoType: string
-  base64Data: string
+  s3Key: string
   validation?: {
     isValid: boolean
     confidence: number
@@ -75,19 +75,22 @@ export async function POST(req: NextRequest) {
         ]
       )
 
-      // Process and upload photos
+      // Process photo metadata (files already uploaded to S3)
       for (const photo of payload.photos) {
         try {
-          // Generate S3 key
-          const timestamp = Date.now()
-          const key = `survey/${survey.survey_id}/${photo.photoType}_${timestamp}.jpg`
+          // Validate S3 key
+          if (!photo.s3Key || typeof photo.s3Key !== 'string') {
+            throw new Error(`Invalid S3 key for photo type: ${photo.photoType}`)
+          }
           
-          // Convert base64 to buffer and upload
-          const buffer = Buffer.from(photo.base64Data, 'base64')
-          await uploadBuffer(key, buffer, 'image/jpeg')
+          // Validate S3 key format (should be from our temp upload)
+          if (!photo.s3Key.startsWith('survey/tmp/')) {
+            throw new Error(`Invalid S3 key format for photo type: ${photo.photoType}`)
+          }
           
-          // Get S3 URL
-          const s3Url = getS3Url(key)
+          // Move from temp to final location (copy and delete old)
+          // For now, we'll just use the temp key - in production you might want to move it
+          const s3Url = getS3Url(photo.s3Key)
           
           // Insert photo record
           await client.query(
@@ -95,7 +98,7 @@ export async function POST(req: NextRequest) {
              VALUES($1, $2, $3, $4, $5)`,
             [
               survey.survey_id,
-              key,
+              photo.s3Key, // Use the temp key for now
               s3Url,
               photo.photoType,
               photo.validation ? JSON.stringify(photo.validation) : null

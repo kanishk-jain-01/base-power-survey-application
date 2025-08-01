@@ -4,7 +4,7 @@ import { ValidationResult, PhotoType } from '@/lib/types';
 const NEEDS_DATA_EXTRACTION: PhotoType[] = ['main_disconnect_switch'];
 
 // Photo validation prompts based on survey criteria
-const getValidationPrompt = (photoType: PhotoType): string => {
+export const getValidationPrompt = (photoType: PhotoType): string => {
   const wantsData = NEEDS_DATA_EXTRACTION.includes(photoType);
   const jsonFields = wantsData
     ? '- isValid: boolean (true if photo meets all criteria)\n- confidence: number (0-1, confidence in your assessment)\n- feedback: string (specific feedback for the user)\n- extractedData: object (any data you can extract from the image)'

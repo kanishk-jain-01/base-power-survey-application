@@ -5,11 +5,7 @@ export const pool = new Pool({
   max: 10,
   idleTimeoutMillis: 10000,
   connectionTimeoutMillis: 2000,
-  // SSL with CA from environment variable (works in serverless)
-  ssl: {
-    rejectUnauthorized: true,
-    ca: process.env.RDS_CA_PEM
-  }
+  ssl: { rejectUnauthorized: false }
 })
 
 // Test connection on startup

@@ -119,6 +119,7 @@ Create a `.env` file in the root directory:
    - Create PostgreSQL RDS instance
    - Create S3 bucket with private access
    - Configure IAM user with appropriate permissions
+   - See [AWS Setup Guide](#-aws-setup-guide) below for detailed configuration
 
 4. **Initialize database**
    ```bash
@@ -192,9 +193,108 @@ EXPOSE 3000
 CMD ["npm", "start"]
 ```
 
+## ⚙️ AWS Setup Guide
+
+### S3 Bucket Configuration
+
+**Configure CORS for Presigned Uploads**
+   
+   In AWS Console → S3 → Your Bucket → Permissions → Cross-origin resource sharing (CORS):
+   
+   ```json
+   [
+       {
+           "AllowedHeaders": ["*"],
+           "AllowedMethods": ["PUT", "POST"],
+           "AllowedOrigins": [
+               "https://yourdomain.com",
+               "https://your-vercel-app.vercel.app",
+               "http://localhost:3000"
+           ],
+           "ExposeHeaders": ["ETag"],
+           "MaxAgeSeconds": 3000
+       }
+   ]
+   ```
+   
+   **⚠️ Important:** Replace the URLs with your actual domain names. The CORS configuration is required for browser uploads via presigned URLs.
+
+
+### RDS PostgreSQL Configuration
+
+1. **Create RDS Instance**
+   - Engine: PostgreSQL 15+
+   - Instance class: db.t3.micro (for development)
+   - Storage: 20 GB gp3 (encrypted)
+   - VPC: Default or custom with internet access
+   - Public access: Yes (for development)
+   - Security group: Allow port 5432 from your IP
+
+2. **Security Group Rules**
+   ```
+   Type: PostgreSQL
+   Protocol: TCP
+   Port: 5432
+   Source: Your IP address (for development)
+           0.0.0.0/0 (for production with proper authentication)
+   ```
+
+
+### Environment Variables Setup
+
+After creating your AWS resources, update your `.env` file:
+
+```bash
+# Database (from RDS endpoint)
+DATABASE_URL=postgresql://survey_app:password@your-rds-endpoint:5432/database_name
+
+# AWS Configuration
+AWS_REGION=us-east-2
+AWS_ACCESS_KEY_ID=AKIA...
+AWS_SECRET_ACCESS_KEY=...
+AWS_S3_BUCKET=your-bucket-name
+
+# API Keys
+OPENAI_API_KEY=sk-proj-...
+INTERNAL_API_KEY=your-64-char-random-string
+```
+
 ## 🧪 API Reference
 
-### Submit Survey
+### Photo Upload Flow
+
+#### 1. Get Presigned Upload URLs
+```http
+POST /api/surveys/photos
+Content-Type: application/json
+
+{
+  "photos": [
+    { "photoType": "meter_closeup" },
+    { "photoType": "panel_main" }
+  ]
+}
+
+Response: {
+  "urls": [
+    {
+      "photoType": "meter_closeup",
+      "key": "survey/tmp/uuid_meter_closeup.jpg",
+      "uploadUrl": "https://bucket.s3.region.amazonaws.com/survey/tmp/uuid_meter_closeup.jpg?X-Amz-Signature=..."
+    }
+  ]
+}
+```
+
+#### 2. Upload Photos to S3
+```http
+PUT {uploadUrl}
+Content-Type: image/jpeg
+
+[Raw image file data]
+```
+
+#### 3. Submit Survey
 ```http
 POST /api/surveys
 Content-Type: application/json
@@ -204,7 +304,7 @@ Content-Type: application/json
   "photos": [
     {
       "photoType": "meter_closeup",
-      "base64Data": "base64-encoded-image",
+      "s3Key": "survey/tmp/uuid_meter_closeup.jpg",
       "validation": {
         "isValid": true,
         "confidence": 0.95,

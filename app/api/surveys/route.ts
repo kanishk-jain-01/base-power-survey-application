@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { GetObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import { uploadBuffer, getS3Url, s3, S3_BUCKET } from '@/lib/aws'
+import { getS3Url, s3, S3_BUCKET } from '@/lib/aws'
 import { pool } from '@/lib/db'
 
 interface PhotoData {
   photoType: string
-  base64Data: string
+  s3Key: string
   validation?: {
     isValid: boolean
     confidence: number
@@ -75,48 +75,40 @@ export async function POST(req: NextRequest) {
         ]
       )
 
-      // Process and upload photos
-      for (const photo of payload.photos) {
-        try {
-          // Validate base64 data
-          if (!photo.base64Data || typeof photo.base64Data !== 'string') {
-            throw new Error(`Invalid base64 data for photo type: ${photo.photoType}`)
-          }
-          
-          // Validate base64 format
-          const base64Pattern = /^[A-Za-z0-9+/]*={0,2}$/
-          if (!base64Pattern.test(photo.base64Data)) {
-            throw new Error(`Invalid base64 format for photo type: ${photo.photoType}`)
-          }
-          
-          // Generate S3 key
-          const timestamp = Date.now()
-          const key = `survey/${survey.survey_id}/${photo.photoType}_${timestamp}.jpg`
-          
-          // Convert base64 to buffer and upload
-          const buffer = Buffer.from(photo.base64Data, 'base64')
-          await uploadBuffer(key, buffer, 'image/jpeg')
-          
-          // Get S3 URL
-          const s3Url = getS3Url(key)
-          
-          // Insert photo record
-          await client.query(
-            `INSERT INTO photos(survey_id, s3_key, s3_url, photo_type, validation_json)
-             VALUES($1, $2, $3, $4, $5)`,
-            [
-              survey.survey_id,
-              key,
-              s3Url,
-              photo.photoType,
-              photo.validation ? JSON.stringify(photo.validation) : null
-            ]
-          )
-        } catch (photoError) {
-          console.error(`Error processing photo ${photo.photoType}:`, photoError)
-          throw photoError
-        }
-      }
+      // Process photo metadata (files already uploaded to S3)
+   for (const photo of payload.photos) {
+     try {
+       // Validate S3 key
+       if (!photo.s3Key || typeof photo.s3Key !== 'string') {
+         throw new Error(`Invalid S3 key for photo type: ${photo.photoType}`)
+       }
+
+       // Validate S3 key format (should be from our temp upload)
+       if (!photo.s3Key.startsWith('survey/tmp/')) {
+         throw new Error(`Invalid S3 key format for photo type: ${photo.photoType}`)
+       }
+
+       // Move from temp to final location (copy and delete old)
+       // For now, we'll just use the temp key - in production you might want to move it
+       const s3Url = getS3Url(photo.s3Key)
+
+       // Insert photo record
+       await client.query(
+         `INSERT INTO photos(survey_id, s3_key, s3_url, photo_type, validation_json)
+          VALUES($1, $2, $3, $4, $5)`,
+         [
+           survey.survey_id,
+           photo.s3Key, // Use the temp key for now
+           s3Url,
+           photo.photoType,
+           photo.validation ? JSON.stringify(photo.validation) : null
+         ]
+       )
+     } catch (photoError) {
+       console.error(`Error processing photo ${photo.photoType}:`, photoError)
+       throw photoError
+     }
+   }
 
       // Insert skipped steps
       for (const stepId of payload.skippedSteps) {

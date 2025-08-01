@@ -14,7 +14,6 @@ import { Input } from '@/components/ui/input';
 import PhotoPreview from '@/components/PhotoPreview';
 import { useSurveyStore } from '@/stores/surveyStore';
 import { SURVEY_STEPS } from '@/lib/surveySteps';
-import { fileToBase64 } from '@/lib/fileUtils';
 import { useHydration } from '@/lib/useHydration';
 import { Edit2, Check, X } from 'lucide-react';
 
@@ -59,35 +58,70 @@ export default function ReviewPage() {
     setIsSubmitting(true);
     
     try {
-      // Convert photos to base64 format for API
-      const photoData = await Promise.all(
-        validPhotos.map(async (photo) => ({
-          photoType: photo.photoType,
-          base64Data: await fileToBase64(photo.file),
-          validation: photo.validation
-        }))
+      // Step 1: Get presigned URLs for photo uploads
+      const presignResponse = await fetch('/api/surveys/photos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          photos: validPhotos.map(photo => ({ photoType: photo.photoType }))
+        }),
+      });
+
+      if (!presignResponse.ok) {
+        const error = await safeJsonParse(presignResponse);
+        throw new Error(error?.error || 'Failed to get upload URLs');
+      }
+
+      const { urls } = await presignResponse.json();
+
+      // Step 2: Upload each photo directly to S3
+      const uploadedPhotos = await Promise.all(
+        urls.map(async ({ photoType, key, uploadUrl }: { photoType: string, key: string, uploadUrl: string }) => {
+          const photo = validPhotos.find(p => p.photoType === photoType);
+          if (!photo) throw new Error(`Photo not found for type: ${photoType}`);
+
+          const uploadResponse = await fetch(uploadUrl, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'image/jpeg',
+            },
+            body: photo.file,
+          });
+
+          if (!uploadResponse.ok) {
+            throw new Error(`Failed to upload photo: ${photoType}`);
+          }
+
+          return {
+            photoType,
+            s3Key: key,
+            validation: photo.validation
+          };
+        })
       );
 
-      // Submit to API
-      const response = await fetch('/api/surveys', {
+      // Step 3: Submit survey metadata with S3 keys
+      const surveyResponse = await fetch('/api/surveys', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           customerEmail,
-          photos: photoData,
+          photos: uploadedPhotos,
           skippedSteps,
           mainDisconnectAmperage,
         }),
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to submit survey');
+      if (!surveyResponse.ok) {
+        const error = await safeJsonParse(surveyResponse);
+        throw new Error(error?.error || 'Failed to submit survey');
       }
 
-      const result = await response.json();
+      const result = await surveyResponse.json();
       
       alert(`Survey submitted successfully! Survey ID: ${result.surveyId}`);
       resetSurvey();
@@ -99,6 +133,19 @@ export default function ReviewPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Helper function to safely parse JSON responses (avoids SyntaxError on non-JSON responses)
+  const safeJsonParse = async (response: Response) => {
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      try {
+        return await response.json();
+      } catch {
+        return null;
+      }
+    }
+    return null;
   };
 
   const handleRetakePhoto = (photoType: string) => {

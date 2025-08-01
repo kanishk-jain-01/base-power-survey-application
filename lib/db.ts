@@ -1,6 +1,16 @@
-import { Pool } from 'pg'
+// Set NODE_EXTRA_CA_CERTS before any other imports (for Vercel serverless)
+import fs from 'fs'
+import path from 'path'
 
-// NODE_EXTRA_CA_CERTS should be set by startup script before Node starts
+if (!process.env.NODE_EXTRA_CA_CERTS) {
+  const caPath = path.join(process.cwd(), 'rds-ca-bundle.pem')
+  if (fs.existsSync(caPath)) {
+    process.env.NODE_EXTRA_CA_CERTS = caPath
+    console.log('✅ Set NODE_EXTRA_CA_CERTS for serverless:', caPath)
+  }
+}
+
+import { Pool } from 'pg'
 
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,

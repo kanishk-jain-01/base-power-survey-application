@@ -1,18 +1,3 @@
-# 🛣️ API Routes Documentation
-
-This document provides comprehensive documentation for all API endpoints in the Base Power Survey Application.
-
-## 📋 Overview
-
-The application provides RESTful APIs for survey management, photo validation, and data retrieval. All endpoints use JSON for request/response bodies unless otherwise specified.
-
-## 🔐 Authentication
-
-### Internal API Access
-- **Header**: `x-internal-api-key`
-- **Value**: Environment variable `INTERNAL_API_KEY`
-- **Usage**: Required for external API access; optional for same-origin requests
-
 ## 📡 API Endpoints
 
 ### 1. Survey Management
@@ -226,34 +211,4 @@ x-internal-api-key: [required]
 - `401 Unauthorized`: Invalid or missing API key
 - `404 Not Found`: Photo ID doesn't exist
 - `500 Internal Server Error`: Database or S3 errors
-
-## 📝 Photo Types
-
-The application supports these standardized photo types:
-
-| Photo Type | Description | AI Validation |
-|------------|-------------|---------------|
-| `meter_closeup` | Close-up of electrical meter | Amperage extraction |
-| `meter_area` | Wide view of meter area | Context validation |
-| `adjacent_wall_left` | Wall to the left of meter | Space assessment |
-| `adjacent_wall_right` | Wall to the right of meter | Space assessment |
-| `fence_area` | Fence or boundary area | Clearance validation |
-| `ac_unit_label` | AC unit nameplate/label | Equipment identification |
-| `ac_unit_area` | AC unit and surrounding area | Installation context |
-| `panel_main` | Main electrical panel | Panel identification |
-| `breaker_box_interior` | Interior of breaker box | Circuit validation |
-| `main_disconnect_switch` | Main disconnect switch | Safety compliance |
-| `service_entrance` | Service entrance point | Infrastructure assessment |
-
-## 🔄 Typical Workflow
-
-1. **Start Survey**: User enters customer email
-2. **Capture Photos**: For each required photo type:
-   - Take photo with camera
-   - Validate with `/api/validate`
-   - Retry if validation fails
-3. **Review**: User reviews all captured photos
-4. **Upload**: Frontend calls `/api/surveys/photos` for presigned URLs
-5. **S3 Upload**: Photos uploaded directly to S3
-6. **Submit**: Survey metadata submitted to `/api/surveys`
 

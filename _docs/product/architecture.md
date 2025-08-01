@@ -32,32 +32,34 @@ Ensures the protection of data and secure communication within the system.
 
 ## System Architecture Diagram
 
+```mermaid
 graph TD
 
-subgraph Client-Side [User Browser]
-A[React + Next.js App] --> User Interactions| B[UI Components]
-B --> State Management C[Zustand Store]
-C--> Camera Feed D[AR Guidance & Capture]
-D --> Photo Captured E[AI Validation Client-Side]
-E --> Feedback B
-E --> Validated Photos/Data F[Review & Submit]
+subgraph Client["User Browser"]
+A[React + Next.js App] -->|User Interactions| B[UI Components]
+B -->|State Management| C[Zustand Store]
+C -->|Camera Feed| D[AR Guidance & Capture]
+D -->|Photo Captured| E[AI Validation Client-Side]
+E -->|Feedback| B
+E -->|Validated Photos/Data| F[Review & Submit]
 end
 
-subgraph Server-Side [Next.js Backend]
-E --> Complex Validation G[API Routes]
-G-->|AI Processing| H[AI Validation Service]
-H --> YOLO/LLM/Tesseract G
-G --> Data Access| I[Data Layer]
-I--> Queries J[PostgreSQL on AWS RDS]
-G--> File Upload K[AWS S3 Storage]
-F --> Submit Survey G
-G --> Forward Data L[Base Power API]
+subgraph Server["Next.js Backend"]
+E -->|Complex Validation| G[API Routes]
+G -->|AI Processing| H[AI Validation Service]
+H -->|YOLO/LLM/Tesseract| G
+G -->|Data Access| I[Data Layer]
+I -->|Queries| J[PostgreSQL on AWS RDS]
+G -->|File Upload| K[AWS S3 Storage]
+F -->|Submit Survey| G
+G -->|Forward Data| L[Base Power API]
 end
 
-subgraph Security Layer
-M[API Authentication] --> Protect Routes G
-N[Data Encryption] --> Secure Storage J
-N --> Secure Uploads K
+subgraph Security["Security Layer"]
+M[API Authentication] -->|Protect Routes| G
+N[Data Encryption] -->|Secure Storage| J
+N -->|Secure Uploads| K
 end
 
-A --> HTTPS G
+A -->|HTTPS| G
+```

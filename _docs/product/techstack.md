@@ -1,7 +1,3 @@
-# Base Power Survey App - Tech Stack Overview
-
-This document outlines the core technologies and platforms chosen for the Base Power Company Site Survey Application, designed for efficient data collection and AI-driven validation.
-
 ## 1. Frontend
 
 - **Framework:** React + Next.js
@@ -36,14 +32,3 @@ This document outlines the core technologies and platforms chosen for the Base P
 - **Client-Side OCR:** Tesseract.js
   - **Reasoning:** For optical character recognition directly within the browser, potentially for immediate feedback or initial data extraction.
 
-## 5. Security
-
-- **Authentication:** NextAuth.js
-  - **Reasoning:** A flexible authentication library for Next.js applications, supporting various authentication providers.
-- **Data Protection:** Data Encryption
-  - **Reasoning:** Essential for protecting sensitive survey data both in transit and at rest.
-
-## 6. Testing
-
-- **Approach:** Light Test Suite + Manual Testing
-  - **Reasoning:** Automated tests for components and API routes (e.g., blurry picture scenarios), complemented by extensive manual testing at customer sites for real-world validation.

@@ -43,7 +43,8 @@ The application guides the user through a structured process to capture all nece
 
 ## Diagram for User Flow
 
-    graph TD
+```mermaid
+graph TD
     A[Start App] --> B[Enter Email]
     B --> C[Begin Survey]
     subgraph Guided Capture
@@ -65,59 +66,4 @@ The application guides the user through a structured process to capture all nece
     K --> M[Submit Survey]
     M --> N[Data Sent to Base API]
     N --> O[Confirmation Screen]
-
-## File Structure
-
-project-root/
-├── app/
-│ ├── api/
-│ │ ├── validate/ # Next.js API routes for LLM validation
-│ │ │ └── route.ts # POST: Send image to LLM, return validation
-│ │ └── submit/ # API route for submitting to Base API
-│ │ └── route.ts # POST: Forward photos/data to Base
-│ ├── (survey)/ # Main survey app routes
-│ │ ├── layout.tsx # Layout for survey pages (e.g., nav bar)
-│ │ ├── page.tsx # Landing page (email input)
-│ │ ├── step/ # Dynamic route for survey steps
-│ │ │ └── [stepId]/page.tsx # Individual step (e.g., meter, A/C)
-│ │ └── review/page.tsx # Review page for final data/photos
-│ ├── globals.css # TailwindCSS global styles
-│ └── favicon.ico # App favicon
-├── components/ # Reusable React components (ShadCN + custom)
-│ ├── ui/ # ShadCN components (e.g., Button, Modal)
-│ │ ├── button.tsx
-│ │ ├── modal.tsx
-│ │ └── ...
-│ ├── CameraView.tsx # Webcam feed with AR overlays
-│ ├── FeedbackModal.tsx # Validation feedback (success/fail/override)
-│ ├── PhotoPreview.tsx # Thumbnail for review page
-│ └── StepProgress.tsx # Progress bar for survey steps
-├── lib/ # Utility functions and configs
-│ ├── aws.ts # AWS S3 upload logic
-│ ├── yolo.ts # YOLO model integration (ONNX.js)
-│ ├── tesseract.ts # Tesseract.js for client-side OCR
-│ ├── llm.ts # LLM API client (e.g., xAI or OpenAI)
-│ ├── db.ts # PostgreSQL connection (pg or drizzle)
-│ └── types.ts # TypeScript interfaces (e.g., Survey, Photo)
-├── public/ # Static assets
-│ ├── models/ # Pre-trained YOLO model (e.g., yolov8n.onnx)
-│ │ └── yolov8n.onnx
-│ ├── images/ # Static images (e.g., examples, logos)
-│ └── fonts/ # Custom fonts (if any)
-├── stores/ # Zustand stores
-│ └── surveyStore.ts # State for survey (steps, photos, data)
-├── prisma/ # Prisma ORM for PostgreSQL (optional)
-│ └── schema.prisma # Database schema (Customer, Survey, Photo)
-├── scripts/ # Utility scripts (e.g., DB seeding)
-│ └── seed.ts
-├── tests/ # Tests for components and API routes
-│ ├── components/
-│ │ └── CameraView.test.tsx
-│ └── api/
-│ └── validate.test.ts
-├── .env # Env vars (AWS keys, DB URL, API keys)
-├── next.config.js # Next.js config (e.g., WebAssembly for ONNX)
-├── tailwind.config.js # TailwindCSS config
-├── tsconfig.json # TypeScript config
-├── package.json # Dependencies and scripts
-└── README.md # Project documentation
+```

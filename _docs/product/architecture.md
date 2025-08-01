@@ -32,6 +32,7 @@ Ensures the protection of data and secure communication within the system.
 
 ## System Architecture Diagram
 
+```mermaid
 graph TD
 
 subgraph Client-Side [User Browser]
@@ -61,3 +62,4 @@ N --> Secure Uploads K
 end
 
 A --> HTTPS G
+```

@@ -43,7 +43,8 @@ The application guides the user through a structured process to capture all nece
 
 ## Diagram for User Flow
 
-    graph TD
+```mermaid
+graph TD
     A[Start App] --> B[Enter Email]
     B --> C[Begin Survey]
     subgraph Guided Capture
@@ -65,6 +66,7 @@ The application guides the user through a structured process to capture all nece
     K --> M[Submit Survey]
     M --> N[Data Sent to Base API]
     N --> O[Confirmation Screen]
+```
 
 ## File Structure
 

@@ -71,6 +71,7 @@ The relationships between these entities are as follows:
 
 ## 3. Entity-Relationship Diagram (ERD)
 
+```mermaid
 erDiagram
 CUSTOMER ||--o{ SURVEY : has
 SURVEY ||--o{ PHOTO : contains
@@ -107,3 +108,4 @@ SURVEY ||--o{ PHOTO : contains
         JSONB validation_json "AI validation results per photo"
         JSONB metadata "EXIF and technical data"
     }
+```

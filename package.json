@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "./start.sh next dev",
+    "dev": "next dev",
     "build": "next build",
-    "start": "./start.sh next start",
+    "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",

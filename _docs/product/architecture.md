@@ -1,65 +1,83 @@
-# Base Power Survey App - System Architecture
 
-The Base Power Company Site Survey Application is designed with a clear separation between client-side (user browser) and server-side (Next.js backend) components, supported by a robust security layer and cloud infrastructure.
+---
+## 1. Client – User Browser
+The client is a React application built with the Next.js **App Router**.
 
-## 1. Client-Side (User Browser)
+• **UI Layer** – Components from `shadcn/ui` plus custom elements provide the interface.<br/>
+• **State Management** – A single Zustand store (`stores/surveyStore.ts`) tracks survey progress, photos, and validation results.<br/>
+• **Camera & AR Guidance** – Components in `components/Camera*` render the live camera feed and optional overlay guides (`lib/photoOverlays.ts`).<br/>
+• **Local Validation Trigger** – When a photo is captured the client instantly requests validation (see API below) so the user receives fast feedback.<br/>
+• **Review & Submit** – After all required photos are captured the user reviews the set and submits the survey metadata.
 
-The user interacts with a React + Next.js application, which handles the user interface, state management, and initial data capture and validation.
+> Future 🔭 A lightweight YOLO model will run **on-device** inside the Camera/AR layer to give real-time framing hints.  It is not in production yet and is therefore dashed in the diagram.
 
-- **React + Next.js App:** The primary interface for users.
-- **UI Components:** Reusable components built with ShadCN and custom elements.
-- **Zustand Store:** Manages the application's state, including survey steps, captured photos, and data.
-- **Camera Feed:** Provides live video for AR guidance and photo capture.
-- **AI Validation (Client-Side):** Performs initial validation of captured photos (e.g., image quality checks).
-- **Review & Submit:** Allows users to review collected data and photos before submission.
+---
+## 2. Backend – Next.js API Routes
+All server logic lives inside the same Next.js project under `app/api/*`.
 
-## 2. Server-Side (Next.js Backend)
+| Route | Responsibility |
+|-------|----------------|
+| `/api/validate` | Calls an external multimodal LLM (OpenAI Vision) to grade each photo and optionally extract data. |
+| `/api/surveys/photos` | Generates presigned **PUT** URLs for S3 so the browser can upload images directly and privately. |
+| `/api/surveys` | Persists survey metadata, validation JSON and skipped-step info to Postgres.  It also returns data for admin dashboards. |
+| `/api/photos/[photoId]` | Provides time-limited download links for already-stored photos. |
 
-The backend handles API routes, complex AI validation, data persistence, and integration with external services.
+The backend uses the `pg` library for SQL access (`lib/db.ts`) and `@aws-sdk/*` for S3 operations (`lib/aws.ts`).
 
-- **Next.js API Routes:** Serve as the primary API endpoints for the client-side application.
-- **AI Validation Service:** Processes images using multimodal LLMs for post-picture analysis and potentially YOLO for advanced object detection.
-- **Data Layer:** Manages interactions with the PostgreSQL database.
-- **AWS S3 Storage:** Securely stores uploaded photos.
-- **Base Power API:** An external API where the final survey data is forwarded.
+---
+## 3. Cloud Infrastructure (AWS)
+• **Amazon S3** – Stores original JPEGs.  Files are uploaded under a temporary prefix and can be moved server-side if needed.<br/>
+• **Amazon RDS → PostgreSQL** – Holds customers, surveys, photos and validation results.<br/>
+• **AWS IAM** – Minimal scoped keys used only for S3 access from the server.
 
-## 3. Security Layer
+---
+## 4. Security Layer
+• **HTTPS everywhere** – Enforced by the Vercel/Next.js deployment.<br/>
+• **x-internal-api-key header** – Required for any external integrations hitting the API routes directly.<br/>
+• **S3 presigned URLs** – Ensure the browser never gains broad write permissions.
 
-Ensures the protection of data and secure communication within the system.
-
-- **API Authentication:** Secures access to backend API routes.
-- **Data Encryption:** Protects sensitive data at rest and in transit.
-
-## System Architecture Diagram
-
+---
+## 5. System Architecture Diagram
 ```mermaid
 graph TD
+  %% === Client Side ===
+  subgraph Client["User Browser"]
+    UI["Next.js App (React / shadcn)"] --> State["Zustand Store"]
+    State --> Camera["Camera View + AR Guidance"]
+    Camera -->|"capture"| Preview["Photo Preview"]
+    Preview -->|"/api/validate"| ValidateReq
+    Preview -->|"/api/surveys/photos"| PresignReq
+    Preview --> Review["Review & Submit"]
+  end
 
-subgraph Client["User Browser"]
-A[React + Next.js App] -->|User Interactions| B[UI Components]
-B -->|State Management| C[Zustand Store]
-C -->|Camera Feed| D[AR Guidance & Capture]
-D -->|Photo Captured| E[AI Validation Client-Side]
-E -->|Feedback| B
-E -->|Validated Photos/Data| F[Review & Submit]
-end
+  %% === Backend ===
+  subgraph Backend["Next.js API Routes"]
+    ValidateReq --> ValidateRoute["validate route"]
+    ValidateRoute -->|"OpenAI Vision"| LLM["LLM Service"]
 
-subgraph Server["Next.js Backend"]
-E -->|Complex Validation| G[API Routes]
-G -->|AI Processing| H[AI Validation Service]
-H -->|YOLO/LLM/Tesseract| G
-G -->|Data Access| I[Data Layer]
-I -->|Queries| J[PostgreSQL on AWS RDS]
-G -->|File Upload| K[AWS S3 Storage]
-F -->|Submit Survey| G
-G -->|Forward Data| L[Base Power API]
-end
+    PresignReq --> PhotosRoute["photos route"]
+    PhotosRoute -->|"Presigned URL"| S3[("AWS S3")]
 
-subgraph Security["Security Layer"]
-M[API Authentication] -->|Protect Routes| G
-N[Data Encryption] -->|Secure Storage| J
-N -->|Secure Uploads| K
-end
+    Review --> SurveysReq["/api/surveys"]
+    SurveysReq --> SurveysRoute["surveys route"]
+    SurveysRoute --> Postgres[("PostgreSQL – AWS RDS")]
+    SurveysRoute --> S3
+  end
 
-A -->|HTTPS| G
+  %% === Storage ===
+  S3
+  Postgres
+
+  %% === Security ===
+  subgraph Security
+    Auth["HTTPS + API Key"]
+  end
+  Auth --- ValidateRoute
+  Auth --- PhotosRoute
+  Auth --- SurveysRoute
+
+  %% === Future Work ===
+  Camera -.-> YOLO["YOLO Object Detection (future)"]
 ```
+
+---

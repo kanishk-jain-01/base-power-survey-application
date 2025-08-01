@@ -13,7 +13,7 @@ import { getOverlayConfig, getOverlayStyles } from '@/lib/photoOverlays';
 
 interface CameraViewProps {
   photoType: PhotoType;
-  onPhotoCapture: (file: File, preview: string) => void;
+  onPhotoCapture: (file: File, preview: string, validation?: ValidationResult) => void;
   onSkip?: () => void;
   showSkip?: boolean;
   onAmperageConfirm?: (amperage: number) => void;
@@ -180,26 +180,26 @@ export default function CameraView({
   // Handle validation feedback actions
   const handleContinue = useCallback(() => {
     if (capturedFile && capturedPhoto) {
-      onPhotoCapture(capturedFile, capturedPhoto);
+      onPhotoCapture(capturedFile, capturedPhoto, validationResult || undefined);
       setShowFeedback(false);
     }
-  }, [capturedFile, capturedPhoto, onPhotoCapture]);
+  }, [capturedFile, capturedPhoto, onPhotoCapture, validationResult]);
 
   const handleOverride = useCallback(() => {
     if (capturedFile && capturedPhoto) {
-      onPhotoCapture(capturedFile, capturedPhoto);
+      onPhotoCapture(capturedFile, capturedPhoto, validationResult || undefined);
       setShowFeedback(false);
     }
-  }, [capturedFile, capturedPhoto, onPhotoCapture]);
+  }, [capturedFile, capturedPhoto, onPhotoCapture, validationResult]);
 
   // Handle data confirmation modal actions
   const handleAmperageConfirm = useCallback((amperage: number) => {
     if (capturedFile && capturedPhoto) {
       onAmperageConfirm?.(amperage);
-      onPhotoCapture(capturedFile, capturedPhoto);
+      onPhotoCapture(capturedFile, capturedPhoto, validationResult || undefined);
       setShowDataConfirm(false);
     }
-  }, [capturedFile, capturedPhoto, onPhotoCapture, onAmperageConfirm]);
+  }, [capturedFile, capturedPhoto, onPhotoCapture, onAmperageConfirm, validationResult]);
 
   const handleDataRetake = useCallback(() => {
     setShowDataConfirm(false);

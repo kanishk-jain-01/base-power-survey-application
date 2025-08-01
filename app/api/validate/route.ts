@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ValidationResult, PhotoType } from '@/lib/types';
+import { rateLimit } from '@/lib/rateLimit';
 
 // LLM API configuration
 const LLM_CONFIG = {
@@ -110,13 +111,28 @@ Criteria for ${photoType}:`;
 }
 
 export async function POST(request: NextRequest) {
-  // For internal requests from our frontend, check if it's coming from same origin
-  // For external API access, require API key
+  // Auth: require API key for external calls, allow same-origin for frontend
   const apiKey = request.headers.get('x-internal-api-key')
-  const isExternalRequest = apiKey !== null
+  const origin = request.headers.get('origin')
+  const host = request.headers.get('host')
   
-  if (isExternalRequest && apiKey !== process.env.INTERNAL_API_KEY) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  // If API key is provided, validate it (external access)
+  if (apiKey) {
+    if (apiKey !== process.env.INTERNAL_API_KEY) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+  } else {
+    // No API key: only allow same-origin requests (frontend)
+    if (!origin || !host || !origin.includes(host)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+  }
+
+  // Basic per-IP rate limiting (30 requests / minute)
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const { allowed } = rateLimit(ip, 30, 60_000)
+  if (!allowed) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   }
 
   try {

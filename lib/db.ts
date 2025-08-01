@@ -5,9 +5,10 @@ export const pool = new Pool({
   max: 10,
   idleTimeoutMillis: 10000,
   connectionTimeoutMillis: 2000,
-  ssl: {
-    rejectUnauthorized: false // AWS RDS requires SSL
-  }
+  // SSL configuration: always use SSL, but skip cert validation in development
+  ssl: process.env.NODE_ENV === 'development'
+    ? { rejectUnauthorized: false }
+    : { rejectUnauthorized: true }
 })
 
 // Test connection on startup

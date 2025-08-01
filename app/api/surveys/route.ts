@@ -25,13 +25,21 @@ interface SurveySubmission {
 }
 
 export async function POST(req: NextRequest) {
-  // For internal requests from our frontend, check if it's coming from same origin
-  // For external API access, require API key
+  // Auth: require API key for external calls, allow same-origin for frontend
   const apiKey = req.headers.get('x-internal-api-key')
-  const isExternalRequest = apiKey !== null
+  const origin = req.headers.get('origin')
+  const host = req.headers.get('host')
   
-  if (isExternalRequest && apiKey !== process.env.INTERNAL_API_KEY) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  // If API key is provided, validate it (external access)
+  if (apiKey) {
+    if (apiKey !== process.env.INTERNAL_API_KEY) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+  } else {
+    // No API key: only allow same-origin requests (frontend)
+    if (!origin || !host || !origin.includes(host)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
   }
 
   try {

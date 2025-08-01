@@ -3,7 +3,6 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import { NextRequest } from 'next/server'
 import { POST } from '@/app/api/validate/route'
-import { getValidationPrompt } from '@/lib/llm'
 
 describe('Validate Endpoint Integration Test', () => {
   let testImageBase64: string
@@ -16,11 +15,10 @@ describe('Validate Endpoint Integration Test', () => {
   })
 
   it('should validate main disconnect switch image and extract 200A amperage', async () => {
-    // Prepare request payload using actual prompt generation
+    // Prepare request payload - prompt is now generated server-side
     const payload = {
       image: testImageBase64,
-      photoType: 'main_disconnect_switch',
-      prompt: getValidationPrompt('main_disconnect_switch')
+      photoType: 'main_disconnect_switch'
     }
 
     // Create NextRequest and call POST handler directly

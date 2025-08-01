@@ -1,93 +1,5 @@
 import { ValidationResult, PhotoType } from '@/lib/types';
 
-// Photos that need data extraction
-const NEEDS_DATA_EXTRACTION: PhotoType[] = ['main_disconnect_switch'];
-
-// Photo validation prompts based on survey criteria
-export const getValidationPrompt = (photoType: PhotoType): string => {
-  const wantsData = NEEDS_DATA_EXTRACTION.includes(photoType);
-  const jsonFields = wantsData
-    ? '- isValid: boolean (true if photo meets all criteria)\n- confidence: number (0-1, confidence in your assessment)\n- feedback: string (specific feedback for the user)\n- extractedData: object (any data you can extract from the image)'
-    : '- isValid: boolean (true if photo meets all criteria)\n- confidence: number (0-1, confidence in your assessment)\n- feedback: string (specific feedback for the user)';
-
-  const basePrompt = `You are an expert at validating home energy survey photos. Analyze this image and determine if it meets the criteria for a "${photoType}" photo.
-
-Return a JSON response with:
-${jsonFields}
-
-Criteria for ${photoType}:`;
-
-  const criteria: Record<PhotoType, string> = {
-    meter_closeup: `
-- Image contains an identifiable electricity meter (circular or rectangular with glass/plastic cover)
-- Meter numbers/text are visible and legible
-- Image is sharp and not blurry
-- Meter fills significant portion of the frame`,
-
-    meter_area_wide: `
-- Previously identified meter is visible within wider shot
-- Shows building's exterior wall
-- Includes ground and surrounding area
-- Shows potential obstructions like windows, doors, utility boxes`,
-
-    meter_area_right: `
-- Shows exterior wall and adjacent ground space
-- Captures area to the right of the meter location
-- Different perspective from previous wide shot`,
-
-    meter_area_left: `
-- Shows exterior wall and adjacent ground space  
-- Captures area to the left of the meter location
-- Different perspective from previous shots`,
-
-    adjacent_wall: `
-- Shows long expanse of exterior wall
-- Captures corner-to-corner view if possible
-- Includes corner of house if visible`,
-
-    area_behind_fence: `
-- Fence is visible in the image
-- Shows space between fence and house wall
-- Image is sharp and not blurry`,
-
-
-
-    ac_unit_label: `
-- Contains a metallic or paper label with technical specifications
-- Text is readable, especially LRA or RLA numbers
-- Label is the primary subject of the photo`,
-
-    second_ac_unit_label: `
-- Contains a metallic or paper label with technical specifications
-- Text is readable, especially LRA or RLA numbers  
-- Label is the primary subject of the photo
-- This is for a second A/C unit (different from first)`,
-
-    breaker_box_interior: `
-- Shows inside of an electrical panel
-- Multiple rows of breaker switches are visible
-- Entire set of breakers is visible in frame
-- Panel door is open`,
-
-    main_disconnect_switch: `
-- Focuses on single, larger breaker switch
-- Number (100, 125, 150, 200) is visible and readable
-- Switch may be labeled as "Main"
-- Extract the amperage number if visible`,
-
-    breaker_box_area: `
-- Breaker box is visible within larger context
-- Shows location (garage wall, closet, etc.)
-- Includes surrounding area and any obstructions`,
-  };
-
-  const dataExtractionNote = wantsData 
-    ? '\n\nIf extracting data (like amperage numbers), include specific values in extractedData.'
-    : '';
-  
-  return `${basePrompt}\n${criteria[photoType]}${dataExtractionNote}`;
-};
-
 // Convert image file to base64 for API
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -103,14 +15,13 @@ const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
-// Main validation function
+// Main validation function - now only sends image and photoType
 export async function validatePhoto(
   file: File,
   photoType: PhotoType
 ): Promise<ValidationResult> {
   try {
     const base64Image = await fileToBase64(file);
-    const prompt = getValidationPrompt(photoType);
 
     const response = await fetch('/api/validate', {
       method: 'POST',
@@ -119,7 +30,6 @@ export async function validatePhoto(
       },
       body: JSON.stringify({
         image: base64Image,
-        prompt,
         photoType,
       }),
     });

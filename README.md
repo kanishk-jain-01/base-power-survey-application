@@ -203,7 +203,6 @@ The application will be available at `http://localhost:3000`.
    - Instance class: db.t3.micro (for development)
    - Storage: 20 GB gp3 (encrypted)
    - VPC: Default or custom with internet access
-   - Public access: Yes (for development)
    - Security group: Allow port 5432 from your IP
 
 2. **Security Group Rules**

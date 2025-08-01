@@ -110,6 +110,15 @@ Criteria for ${photoType}:`;
 }
 
 export async function POST(request: NextRequest) {
+  // For internal requests from our frontend, check if it's coming from same origin
+  // For external API access, require API key
+  const apiKey = request.headers.get('x-internal-api-key')
+  const isExternalRequest = apiKey !== null
+  
+  if (isExternalRequest && apiKey !== process.env.INTERNAL_API_KEY) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const { image, photoType } = await request.json();
 

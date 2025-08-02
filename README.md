@@ -1,8 +1,8 @@
-# ⚡️ Base Power Survey Application
+# Base Power Survey Application
 
  The app guides users through capturing 11 specific photo types, validates them with AI, extracts critical electrical data (amperage readings), and securely stores everything in an AWS-backed infrastructure.
 
-## 🏗 Architecture Overview
+## Architecture Overview
 
 ```mermaid
 graph TB
@@ -29,7 +29,7 @@ graph TB
     end
 ```
 
-## 🛠 Tech Stack
+## Tech Stack
 
 | Layer | Technology | Purpose |
 |-------|------------|---------|
@@ -43,7 +43,7 @@ graph TB
 | **Auth** | API Key authentication | Internal API protection |
 | **Infrastructure** | AWS (RDS, S3, IAM) | Scalable cloud architecture |
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 base-power-survey-app/
@@ -64,14 +64,7 @@ base-power-survey-app/
 └── _docs/                  # Project documentation
 ```
 
-## 🚀 Getting Started
-
-### Prerequisites
-
-- **Node.js** 20+ 
-- **npm** or **pnpm**
-- **AWS Account** with RDS and S3 access
-- **OpenAI API Key** for photo validation
+## Set-Up
 
 ### Environment Variables
 
@@ -125,9 +118,7 @@ Create a `.env` file in the root directory:
    npm run dev
    ```
 
-The application will be available at `http://localhost:3000`.
-
-## 📜 Available Scripts
+## Available Scripts
 
 | Script | Description |
 |--------|-------------|
@@ -139,19 +130,8 @@ The application will be available at `http://localhost:3000`.
 | `npm run format` | Format code with Prettier |
 | `npm run format:check` | Check code formatting |
 
-## 🏃‍♂️ Survey Workflow
 
-1. **Customer Email Entry** - Identify the survey participant
-2. **Photo Capture Steps** - 11 guided photo captures:
-   - Meter closeup and area views
-   - Adjacent walls and fence areas  
-   - AC unit labels and equipment
-   - Electrical panel and main disconnect
-3. **AI Validation** - Real-time photo quality and content verification
-4. **Review & Submit** - Final review with amperage confirmation
-5. **Secure Storage** - Photos uploaded to S3, metadata to PostgreSQL
-
-## 🔐 Security & Compliance
+## Security 
 
 - **HTTPS enforced** for all data transmission
 - **IAM least-privilege** policies for AWS access
@@ -169,7 +149,7 @@ The application will be available at `http://localhost:3000`.
 3. **Deploy** - automatic builds on push to main
 
 
-## ⚙️ AWS Setup Guide
+## AWS Setup Guide
 
 ### S3 Bucket Configuration
 
@@ -268,13 +248,10 @@ Response: {
 }
 ```
 
-**Note:** `presignedUrl` provides secure, temporary access to photos (expires in 1 hour). Use this URL to view/download photos.
-
-## 📞 Contact
+## Contact
 
 **Project Maintainer:** Kanishk Jain  
 **Email:** [kanishkjain01@icloud.com](mailto:kanishkjain01@icloud.com)  
-**Repository:** [https://github.com/kanishk-jain-01/base-power-survey-application](https://github.com/kanishk-jain-01/base-power-survey-application)
 
 ---
 
